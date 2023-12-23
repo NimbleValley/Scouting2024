@@ -1,0 +1,3 @@
+LOCAL STORAGE DOCUMENTATION:
+
+previousHighlightRow: stores the last highlighted row, makes toggling possible
