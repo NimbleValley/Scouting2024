@@ -1,2 +1,2 @@
 # Scouting2024
-Scouting application for 2024 FRC game, Crescendo.
+Simple frc scouting helper, better data collection, visualization, & more. Created for FRC Crescendo.
