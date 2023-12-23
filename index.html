@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2024 Hexhounds Scouting</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js"> </script>
+    <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
+</head>
+
+<body>
+
+    <!--<div id="loading-container">
+        <div id="load-horizontal"></div>
+        <div id="load-vertical"></div>
+    </div>-->
+    <div id="pick-list-container">
+        <input type="range" min="1.5" max="5" value="4" class="slider" id="pick-list-scale" step="0.1">
+        <form id="pick-list-form">
+            <button id="sync-pick-list-button" class="pick-list-operator-button" type="submit">Sync</button>
+        </form>
+        <button id="sort-pick-list-button" class="pick-list-operator-button" onclick="showPickListSort()">Sort</button>
+        <button id="save-pick-list-button" class="pick-list-operator-button" onclick="downloadPickList()">Save</button>
+        <div id="inner-pick-list-container">
+
+        </div>
+    </div>
+
+    <div id="breakdown-grid">
+
+    </div>
+
+    <div id="settings">
+        <div id="settings-interior">
+            <h5>Settings</h5>
+            <select name="event" id="event-select"></select>
+            <input type="text" id="spreadsheet-url-input">
+            <h5 id="settings-back" onclick="toggleSettings()">Back</h5>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <div id="side-button-container">
+            <div class="side-button" onclick="refreshData()">Refresh</div>
+            <div class="side-button active" onclick="resetRaw()">Raw</div>
+            <div class="side-button" onclick="getTeamData()">Team</div>
+            <div class="side-button" onclick="setUpTeambreakdowns(); openTeambreakdowns();">Breakdown</div>
+            <div class="side-button" onclick="setUpGraph()">Graph</div>
+            <div class="side-button" onclick="setUpCompare()">Compare</div>
+            <div class="side-button" onclick="setUpMatches()">Matches</div>
+            <div class="side-button" onclick="setUpPickList()">Pick List</div>
+            <!--<div class="side-button" onclick="getTBATeams()">TBA</div>-->
+            <div class="side-button" onclick="toggleSettings()">Settings</div>
+        </div>
+        <div id="open-sidebar" onclick="toggleSidebar()">
+            <p>></p>
+        </div>
+    </div>
+    <div id="data-table">
+    </div>
+    <div id="breakdown-lines-container">
+    </div>
+    <div id="graph-container">
+    </div>
+
+    <div id="comment-modal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close-comment-modal">&times;</span>
+            <p>Comment here</p>
+        </div>
+    </div>
+
+    <div id="pick-list-sort-modal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close-pick-list-sort-modal" onclick="closePickListSortModal()">&times;</span>
+            <p>Select statistic to sort by:</p>
+            <div class="container">
+            <div class="pick-list-sort-button" onclick="sortPickList(1)">Auto Points</div>
+            <div class="pick-list-sort-button" onclick="sortPickList(2)">Tele Points</div>
+            <div class="pick-list-sort-button" onclick="sortPickList(13)">Total Points</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="lib/csv.js"></script>
+    <script src="js/picklist.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/autopie.js"></script>
+</body>
+
+</html>
