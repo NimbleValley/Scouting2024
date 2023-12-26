@@ -31,7 +31,11 @@ if (localStorage.getItem("spreadsheet-url") == null || localStorage.getItem("spr
 // Breakdown constants
 const breakdownLines = document.getElementById("breakdown-lines-container");
 const breakdownGrid = document.getElementById("breakdown-grid");
+
+// FIXME important these match up, probably could improve
 const breakdownCategoryHeaders = ["Points"];
+const sortIndexes = [1];
+
 var firstbreakdown = true;
 
 
@@ -251,7 +255,7 @@ function getPickList() {
             }
         }
         console.log(PICK_LIST_OBJECTS);
-        //openTeambreakdowns();
+        //openTeamBreakdowns();
         resetRaw();
     }).catch(error => {
         console.log(error);
@@ -462,7 +466,7 @@ closeCommentModal.onclick = function () {
 function setTeamRowHighlight(row, always) {
     // Team column html elements
     let cols = document.getElementsByClassName("column");
-    
+
     // Resets the column highlights back to normal every 3rd striped
     for (let c = 0; c < cols.length; c++) {
         for (let i = 1; i < cols[c].children.length; i++) {
@@ -496,6 +500,8 @@ function setTeamRowHighlight(row, always) {
 }
 
 function setRowHighlight(row, always) {
+    //FIXME ROW IS A STRING FOR SOME REASON FIX!!!
+
     let cols = document.getElementsByClassName("column");
     for (let c = 0; c < cols.length; c++) {
         for (let i = 1; i < cols[c].children.length; i++) {
@@ -510,7 +516,8 @@ function setRowHighlight(row, always) {
     if (localStorage.getItem("previousHighlightRow") != row || always) {
         localStorage.setItem("previousHighlightRow", row);
         for (let c = 0; c < cols.length; c++) {
-            cols[c].children[parseInt(row)+1].style.setProperty("background-color", "#a8652d", "important");
+            // For now I'm just casting row as an integer ;)
+            cols[c].children[parseInt(row) + 1].style.setProperty("background-color", "#a8652d", "important");
         }
     } else {
         localStorage.setItem("previousHighlightRow", -1);
@@ -518,11 +525,8 @@ function setRowHighlight(row, always) {
 }
 
 function showGrid(recordNum, colNum, record) {
-    // I can't deal with sticky I gave up haha
-    previousGridScrollX = window.scrollX;
-    previousGridScrollY = window.scrollY;
-    //window.scrollTo(0, 0);
-    // Very clean code, great use of sticky
+    // No more sticky instead use fixed ;)
+
     breakdownLines.style.display = "none";
     graphContainer.style.display = "none";
     pickListContainer.style.display = "none";
@@ -545,13 +549,6 @@ function showGrid(recordNum, colNum, record) {
             }
         }
     }
-}
-
-function hideGrid() {
-    body.style.overflow = "auto";
-    frcGrid.style.display = "none";
-    // The impossible sticky strikes again :(
-    //window.scrollTo(previousGridScrollX, previousGridScrollY);
 }
 
 function setUpCompare() {
@@ -1082,10 +1079,9 @@ function doGraph() {
     localStorage.setItem("graph-two", document.getElementById("graph-category-select-two").value);
 }
 
-function setUpTeambreakdowns() {
-    //var breakdownGrid = document.createElement("div");
-    //breakdownGrid.id = "breakdown-grid";
+function setUpTeamBreakdowns() {
 
+    // Reset stuff
     graphContainer.style.display = "none";
     pickListContainer.style.display = "none";
     breakdownGrid.style.display = "grid";
@@ -1094,66 +1090,80 @@ function setUpTeambreakdowns() {
     rawTable.innerHTML = "";
     breakdownGrid.innerHTML = "";
 
-    var temp = document.createElement("select");
-    temp.id = "team-breakdown-select";
-    temp.addEventListener("input", openTeambreakdowns);
+    // Creates the team select html element
+    let tempTeamSelect = document.createElement("select");
+    tempTeamSelect.id = "team-breakdown-select";
+    tempTeamSelect.addEventListener("input", openTeamBreakdowns);
 
-    for (var i = 0; i < TEAMS.length; i++) {
-        var op = document.createElement("option");
+    // Creates & adds every team to the select
+    for (let i = 0; i < TEAMS.length; i++) {
+        let op = document.createElement("option");
         op.text = TEAMS[i];
         op.value = TEAMS[i];
-        temp.append(op);
+        tempTeamSelect.append(op);
     }
+
+    // If there was a previously selected team select them
     if (localStorage.getItem("breakdown-team") != null) {
-        temp.value = localStorage.getItem("breakdown-team");
+        tempTeamSelect.value = localStorage.getItem("breakdown-team");
     }
 
-    for (var i = 0; i < breakdownCategoryHeaders.length; i++) {
+    // Creates all breakdown line graph things
+    for (let i = 0; i < breakdownCategoryHeaders.length; i++) {
 
-        var tempContainer = document.createElement("div");
+        // Parent Container for each line
+        let tempContainer = document.createElement("div");
         tempContainer.className = "line-container";
 
-        var tempLine = document.createElement("div");
+        // Line container
+        let tempLine = document.createElement("div");
         tempLine.className = "breakdown-line";
 
-        var tempPopup = document.createElement("div");
+        // The thing that pops up when you hover over the line 
+        let tempPopup = document.createElement("div");
         tempPopup.className = "breakdown-popup";
         tempContainer.appendChild(tempPopup);
 
-        var tempInnerLine = document.createElement("div");
+        // Actual line element
+        let tempInnerLine = document.createElement("div");
         tempInnerLine.className = "inner-breakdown-line";
         tempInnerLine.style.height = `0 % `;
 
-        var temph4 = document.createElement("h4");
+        // Label for 
+        let temph4 = document.createElement("h4");
         temph4.innerText = breakdownCategoryHeaders[i];
 
+        // Add them all to the correct container/s
         tempLine.appendChild(tempInnerLine);
         tempContainer.appendChild(tempLine);
         tempContainer.appendChild(temph4);
         breakdownLines.appendChild(tempContainer);
     }
 
+    // Top bar that shows team statistics
     let breakdownData = document.createElement("div");
     breakdownData.id = "breakdown-data-container";
 
+    // Container for issues, comments, auto, etc.
     let feedbackContainer = document.createElement("div");
     feedbackContainer.id = "feedback-container";
 
-    breakdownGrid.appendChild(temp);
+    breakdownGrid.appendChild(tempTeamSelect);
     breakdownGrid.appendChild(breakdownData);
     breakdownGrid.appendChild(breakdownLines);
     breakdownGrid.appendChild(feedbackContainer);
     document.body.appendChild(breakdownGrid);
 }
 
-function openTeambreakdowns() {
-    //breakdownLines.innerText = "";
+function openTeamBreakdowns() {
+    // If there is no team data, then get team data
     if (TEAM_COLUMNS.length < 1) {
         getTeamData();
     }
 
+    // Bad way to do this but if it's the first time then run setUpTeamBreakdowns
     if (firstbreakdown) {
-        setUpTeambreakdowns();
+        setUpTeamBreakdowns();
         firstbreakdown = false;
     }
 
@@ -1163,30 +1173,23 @@ function openTeambreakdowns() {
 
 
     //console.log(TEAM_COLUMNS);
-    var breakdownData = [];
-
-    var sortIndexes = [15, 13, 14, 1, 2, 11, 12, 7, 8, 9, 6, 10, 0];
+    let breakdownData = [];
 
     localStorage.setItem("breakdown-team", document.getElementById("team-breakdown-select").value);
 
-    for (var i = 0; i < breakdownCategoryHeaders.length; i++) {
+    for (let i = 0; i < breakdownCategoryHeaders.length; i++) {
         //console.log(sortIndexes[i]);
 
-        var teamsSorted = [];
-        for (var t = 0; t < getSortedIndex(sortIndexes[i], 456, TEAM_ROWS, TEAM_COLUMNS).length; t++) {
+        let teamsSorted = [];
+        for (let t = 0; t < getSortedIndex(sortIndexes[i], 456, TEAM_ROWS, TEAM_COLUMNS).length; t++) {
             teamsSorted[t] = getSortedIndex(sortIndexes[i], 456, TEAM_ROWS, TEAM_COLUMNS)[t][0];
         }
 
         // Sort the column, return the index that was matched up with the data
-        if (true) {
-            breakdownData[i] = teamsSorted.indexOf(parseInt(document.getElementById("team-breakdown-select").value)) / parseFloat(TEAMS.length - 1);
-        } else {
-            // Lol this will never happen, everyone loves if true statements 
-            breakdownData[i] = 0.25;
-        }
+        breakdownData[i] = teamsSorted.indexOf(parseInt(document.getElementById("team-breakdown-select").value)) / parseFloat(TEAMS.length - 1);
     }
 
-    for (var i = 0; i < breakdownCategoryHeaders.length; i++) {
+    for (let i = 0; i < breakdownCategoryHeaders.length; i++) {
         document.getElementsByClassName("inner-breakdown-line")[i].style.height = `${breakdownData[i] * 100}% `;
         document.getElementsByClassName("breakdown-popup")[i].innerText = `${(breakdownData[i] * (TEAMS.length - 1)) + 1} out of ${TEAMS.length} `;
     }
@@ -1656,12 +1659,8 @@ function sortColumn(colNum, type, records, columns, field, team, useCols) {
                 if (team) {
                     temp.classList[1] = i;
                 }
-                //console.log(temp.classList);
-                if (field[s].includes("Placement")) {
-                    temp.innerText = "{ Show Grid }";
-                    temp.id = i;
-                    temp.onclick = function () { showGrid(this.id, this.classList[1], sortedRows) }
-                } else if (field[s].includes("Comments")) {
+
+                if (field[s].includes("Comments")) {
                     temp.innerText = "{ View }";
                     temp.id = i;
                     temp.classList.add(s);
@@ -1800,19 +1799,13 @@ function detectCharacter(val) {
 }
 
 function originalSort(record, column, field) {
-    var cols = document.getElementsByClassName("column");
-    for (var x = 0; x < record.length; x++) {
-        for (var y = 0; y < record[x].length - 1; y++) {
+    let cols = document.getElementsByClassName("column");
+    for (let x = 0; x < record.length; x++) {
+        for (let y = 0; y < record[x].length - 1; y++) {
             //console.log(RECORDS[i][s]);
-            var tempCol = cols[y];
-            var temp = tempCol.children[x + 1];
-            if (field[s].includes("Placement")) {
-                temp.innerText = "{ Show Grid }";
-                temp.id = i;
-                temp.onclick = function () { showGrid(this.id, this.classList[1], record) }
-            } else {
-                temp.innerText = column[y][x];
-            }
+            let tempCol = cols[y];
+            let temp = tempCol.children[x + 1];
+            temp.innerText = column[y][x];
         }
     }
 }

@@ -1,5 +1,6 @@
 LOCAL STORAGE DOCUMENTATION:
 
+breakdown-team:         previously selected breakdown team
 column:                 column to be sorted
 direction:              previous direction that column was sorted, 0, 1, 2
 previousHighlightRow:   stores the last highlighted row, makes toggling possible

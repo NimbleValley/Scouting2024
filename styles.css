@@ -50,7 +50,7 @@ body {
     transition: scale 0.25s, background-color 0.25s, color 0.25s;
     border: 0.35vh solid rgb(235, 228, 220);
     color: rgb(235, 228, 220);
-    border-radius: 1vh;
+    border-radius: 0.75vh;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 2vh;
