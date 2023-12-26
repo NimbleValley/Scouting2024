@@ -1,4 +1,4 @@
-// TODO Everything lol 
+// TODO Everything haha 
 
 
 // Animation timeline
@@ -121,7 +121,7 @@ new Sortable(innerPickListContainer, {
         let oldObject = PICK_LIST_OBJECTS[event.oldIndex];
         // Old pick list key
         let oldKey = PICK_LIST_TEAM_KEY[event.oldIndex];
-        
+
         // All green, yellow, red, and info buttons, as we now need to reset what item they alter
         let green = document.getElementsByClassName("pick-list-green-button");
         let yellow = document.getElementsByClassName("pick-list-yellow-button");
@@ -180,23 +180,31 @@ getTBA(`https://www.thebluealliance.com/api/v3/events/${Year}`, 1);
 
 
 
+// Sets up the buttons in side bar, callback
 function setUpSideButtonEvents() {
     for (var i = 1; i < sideButtons.length - 1; i++) {
         sideButtons[i].addEventListener("click", function () {
             removeActive();
+            // Gives orange highlight to correct side button
             this.classList.add("active");
         });
     }
 }
 
+
+// Removes orange highlight from side buttons
 function removeActive() {
     for (let i = 0; i < sideButtons.length; i++) {
         sideButtons[i].classList = "side-button";
     }
 }
 
+
+// Initial data fetching
 getData();
 
+
+// Fetches pick list
 function getPickList() {
     rawTable.innerHTML = "<h5>Fetching Pick List...</h5>";
     CSV.fetch({
@@ -211,7 +219,7 @@ function getPickList() {
             tempIndex = dataset.records[0][0].match(/\d+/g);
             tempNum = dataset.records[0][1].match(/\d+/g);
             tempColor = dataset.records[0][2].match(/\d+/g);
-        } else if(dataset.records.length != 0 && !String(dataset.records[0][0]).includes(",")) {
+        } else if (dataset.records.length != 0 && !String(dataset.records[0][0]).includes(",")) {
             tempIndex = [dataset.records[0][0]];
             tempNum = [dataset.records[0][1]];
             tempColor = [dataset.records[0][2]];
@@ -256,6 +264,7 @@ function getPickList() {
     });
 }
 
+// Fetches raw data table
 function getData() {
     // Make raw data side button active
     removeActive();
@@ -276,19 +285,14 @@ function getData() {
         rawTable.innerHTML = "";
         FIELDS = dataset.fields;
         RECORDS = dataset.records;
-        TEAMS_FLIPPED = [];
-        TEAMS_COMMS = [];
-        TEAMS_DISABLED = [];
-        TEAMS_DUMB = [];
-        TEAMS_RECKLESS = [];
         TEAMS = [];
-        
+
         //Delete time stamps
         for (let i = 0; i < RECORDS.length; i++) {
             RECORDS[i].splice(0, 1);
         }
         FIELDS.splice(0, 1);
-        
+
         // Update teams array & sort
         for (let i = 0; i < RECORDS.length; i++) {
             if (!TEAMS.includes(RECORDS[i][0])) {
@@ -297,90 +301,13 @@ function getData() {
         }
         TEAMS.sort(function (a, b) { return a - b });
         console.log(TEAMS);
-        
-        // Create grid columns for every data field
-        for (let h = 0; h < FIELDS.length; h++) {
-            COLUMNS[h] = new Array();
-            // Column
-            var col = document.createElement("div");
-            // Header text container
-            var temp = document.createElement("div");
-            temp.className = "table-header-section-raw";
-            // Header text element
-            var text = document.createElement("h3");
-            text.innerText = FIELDS[h];
-            temp.appendChild(text);
-            
-            // First character of records table, used to tell if output is number or text
-            var dataType = 1;
-            if (RECORDS.length > 0) {
-                dataType = new String(RECORDS[0][h]).substring(0, 1);
-            }
 
-            // Sorts columns when header is clicked
-            temp.id = dataType;
-            temp.classList.add(`${(h)}`);
-            temp.onclick = function () { sortColumn(this.classList[1], detectCharacter(this.id), RECORDS, COLUMNS, FIELDS, false, true) };
-            
-            col.className = "column";
-
-            col.appendChild(temp);
-            rawTable.appendChild(col);
-        }
-        
         localStorage.setItem("direction", 0);
         localStorage.setItem("column", -1);
-        
-        for (var i = 0; i < RECORDS.length; i++) {
-            for (var s = 0; s < RECORDS[i].length; s++) {
-                if (FIELDS[s] == "Flip") {
-                    if (RECORDS[i][s] == "Yes") {
-                        TEAMS_FLIPPED.push(RECORDS[i][TEAM_INDEX]);
-                    }
-                }
-                if (FIELDS[s] == "Lost Comms") {
-                    if (RECORDS[i][s] == "Yes") {
-                        TEAMS_COMMS.push(RECORDS[i][TEAM_INDEX]);
-                    }
-                }
-                if (FIELDS[s] == "Disabled") {
-                    if (RECORDS[i][s] == "Yes") {
-                        TEAMS_DISABLED.push(RECORDS[i][TEAM_INDEX]);
-                    }
-                }
-                if (FIELDS[s].includes("Unintelligent")) {
-                    if (RECORDS[i][s] == "Yes") {
-                        TEAMS_DUMB.push(RECORDS[i][TEAM_INDEX]);
-                    }
-                }
-                if (FIELDS[s] == "Reckless") {
-                    if (RECORDS[i][s] == "Yes") {
-                        TEAMS_RECKLESS.push(RECORDS[i][TEAM_INDEX]);
-                    }
-                }
-                COLUMNS[s][i] = RECORDS[i][s];
-                //console.log(RECORDS[i][s]);
-                var temp = document.createElement("div");
-                temp.className = "data-value";
-                temp.id = i;
-                if (FIELDS[s].includes("Placement")) {
-                    temp.innerText = "{ Show Grid }";
-                    temp.classList.add(s);
-                    temp.onclick = function () { showGrid(this.id, this.classList[1], RECORDS) }
-                    temp.addEventListener("click", function () {
-                        setRowHighlight(this.id, true);
-                    });
-                } else {
-                    temp.innerText = RECORDS[i][s];
-                    temp.addEventListener("click", function () {
-                        setRowHighlight(this.id, false);
-                    });
-                }
-                rawTable.children[s].appendChild(temp);
-            }
-        }
+        // Now, update pick list
         getPickList();
     }).catch(error => {
+        // Oh no :(
         console.log(error);
         alert('Terrible Error :(.');
         let montyWindow = window.open("", "Error Report");
@@ -391,6 +318,7 @@ function getData() {
     });
 }
 
+// Opens raw data table, resets raw data table
 function resetRaw() {
     breakdownLines.style.display = "none";
     graphContainer.style.display = "none";
@@ -404,41 +332,44 @@ function resetRaw() {
     TEAMS_DUMB = [];
     TEAMS_RECKLESS = [];
 
-    for (var h = 0; h < FIELDS.length; h++) {
+    for (let h = 0; h < FIELDS.length; h++) {
         COLUMNS[h] = new Array();
-        var col = document.createElement("div");
-        var temp = document.createElement("div");
-        
-        var text = document.createElement("h3");
-        text.innerText = FIELDS[h];
-        temp.appendChild(text);
+        // Temp column
+        let col = document.createElement("div");
+        // Temp header
+        let tempHeader = document.createElement("div");
 
-        temp.className = "table-header-section-raw";
+        // Temp header text
+        let tempHeaderText = document.createElement("h3");
+        tempHeaderText.innerText = FIELDS[h];
+        tempHeader.appendChild(tempHeaderText);
+        tempHeader.className = "table-header-section-raw";
 
-        //console.log(RECORDS[1][h]);
-        var dataType = 1;
+        // Sets data type to first character in the first row of desired column,
+        // used to see if data can be sorted numerically 
+        let dataType = 1;
         if (RECORDS.length > 0) {
             dataType = new String(RECORDS[0][h]).substring(0, 1);
         }
-        temp.id = dataType;
-        temp.classList.add(`${(h)}`);
-        //console.log(temp.classList);
-        //temp.classList.add(h - 1);
-        temp.onclick = function () { sortColumn(this.classList[1], detectCharacter(this.id), RECORDS, COLUMNS, FIELDS, false, true) };
+        // Stores the data type as the header id 
+        // TODO there is probably a more stable and better way to do this
+        tempHeader.id = dataType;
+        // Adds column number to header class list
+        tempHeader.classList.add(`${(h)}`);
+        // FIXME Sorts the column, passes column number, if it's numerical, records, columns, fields, idk what else
+        tempHeader.onclick = function () { sortColumn(this.classList[1], detectCharacter(this.id), RECORDS, COLUMNS, FIELDS, false, true) };
 
         col.className = "column";
-        if (h % 2 == 1) {
-            //col.style.backgroundColor = "#4d473f";
-        }
-        col.appendChild(temp);
+        col.appendChild(tempHeader);
         rawTable.appendChild(col);
     }
 
+    // Resets sort direction & column
     localStorage.setItem("direction", 0);
     localStorage.setItem("column", -1);
 
-    for (var i = 0; i < RECORDS.length; i++) {
-        for (var s = 0; s < RECORDS[i].length; s++) {
+    for (let i = 0; i < RECORDS.length; i++) {
+        for (let s = 0; s < RECORDS[i].length; s++) {
             if (FIELDS[s] == "Flip") {
                 if (RECORDS[i][s] == "Yes") {
                     TEAMS_FLIPPED.push(RECORDS[i][TEAM_INDEX]);
@@ -466,7 +397,7 @@ function resetRaw() {
             }
             COLUMNS[s][i] = RECORDS[i][s];
             //console.log(RECORDS[i][s]);
-            var temp = document.createElement("div");
+            let temp = document.createElement("div");
             temp.className = "data-value";
             temp.id = i;
             if (i % 3 == 0) {
@@ -515,12 +446,12 @@ function showCommentModal(text) {
 }
 
 window.onclick = function (event) {
-    if (event.target == commentModal) {
+    if (event.target == closeCommentModal) {
         commentModal.style.display = "none";
     }
 }
 
-commentModal.onclick = function () {
+closeCommentModal.onclick = function () {
     commentModal.style.display = "none";
 }
 
@@ -1534,12 +1465,12 @@ function openTeambreakdowns() {
     // Adds up the number of times team used floor, single, & double loading stations
     for (var i = 0; i < RECORDS.length; i++) {
         if (RECORDS[i][TEAM_INDEX] == parseInt(document.getElementById("team-breakdown-select").value)) {
-            if(RECORDS[i][30] == "Floor") {
-                usedStations[0] ++;
-            } else if(RECORDS[i][30] == "Single") {
-                usedStations[1] ++;
-            } else if(RECORDS[i][30] == "Double") {
-                usedStations[2] ++;
+            if (RECORDS[i][30] == "Floor") {
+                usedStations[0]++;
+            } else if (RECORDS[i][30] == "Single") {
+                usedStations[1]++;
+            } else if (RECORDS[i][30] == "Double") {
+                usedStations[2]++;
             }
         }
     }
@@ -2171,12 +2102,12 @@ function setUpPickList() {
 
 function downloadPickList() {
     let fileText = JSON.parse(JSON.stringify(PICK_LIST_TEAM_KEY));
-    for(let i = 0; i < fileText.length; i ++) {
+    for (let i = 0; i < fileText.length; i++) {
         fileText[i] += "\n";
     }
     const element = document.createElement("a");
     const file = new Blob(fileText, {
-      type: "text/plain",
+        type: "text/plain",
     });
     element.href = URL.createObjectURL(file);
     element.download = "PicklistRaw.txt";

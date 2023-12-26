@@ -74,24 +74,24 @@ body {
     right: 0;
     background-color: rgba(255, 102, 0, 0);
     position: absolute;
-    transition: background-color 0.25s, scale 0.15s;
+    transition: background-color 0.25s, scale 0.15s, border-radius 0.15s;
     scale: 0 1;
     z-index: -1;
+    border-radius: 10vh;
 }
 
 .table-header-section-raw:hover::after {
     background-color: rgb(235, 228, 220);
     z-index: -1;
     scale: 1 1;
+    border-radius: 0vh;
 }
 
 .data-value {
     white-space: nowrap;
     width: calc(100% - 1vh);
-    height: 100%;
     text-align: center;
     font-size: 2.5vh;
-    font-weight: bolder;
     color: white;
     transition: background-color 0.15s, height 0.15s, text-shadow 0.15s;
     background-color: #474540;
@@ -99,14 +99,12 @@ body {
     margin-left: 0.5vh;
     margin-right: 0.5vh;
     border-radius: 0.67vh;
-    height: fit-content;
+    height: 4vh;
     padding-top: 0.5vh;
     padding-bottom: 0.5vh;
     position: relative;
     border-top: 0.5vh solid #131313;
-    ;
     border-bottom: 0.5vh solid #131313;
-    ;
     font-weight: normal;
 }
 
@@ -164,7 +162,7 @@ body {
 }
 
 /* The Close Button */
-.close-comment-modal {
+#close-comment-modal {
     color: #aaa;
     float: right;
     font-size: 8vh;
@@ -180,8 +178,8 @@ body {
     top: 0;
 }
 
-.close-comment-modal:hover,
-.close-comment-modal:focus {
+#close-comment-modal:hover,
+#close-comment-modal:focus {
     color: rgb(243, 114, 8);
     text-decoration: none;
     cursor: pointer;
