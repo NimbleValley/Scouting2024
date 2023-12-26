@@ -370,6 +370,7 @@ function resetRaw() {
 
     for (let i = 0; i < RECORDS.length; i++) {
         for (let s = 0; s < RECORDS[i].length; s++) {
+            // Updates teams flipped, comms, etc.
             if (FIELDS[s] == "Flip") {
                 if (RECORDS[i][s] == "Yes") {
                     TEAMS_FLIPPED.push(RECORDS[i][TEAM_INDEX]);
@@ -395,45 +396,47 @@ function resetRaw() {
                     TEAMS_RECKLESS.push(RECORDS[i][TEAM_INDEX]);
                 }
             }
+            // Adds to columns
             COLUMNS[s][i] = RECORDS[i][s];
-            //console.log(RECORDS[i][s]);
-            let temp = document.createElement("div");
-            temp.className = "data-value";
-            temp.id = i;
+
+            // Temp data value html element
+            let tempDataValue = document.createElement("div");
+            tempDataValue.className = "data-value";
+            tempDataValue.id = i;
+            // Adds the nice norizontal stripes, easier to read
             if (i % 3 == 0) {
-                temp.style.backgroundColor = "#302f2b";
+                tempDataValue.style.backgroundColor = "#302f2b";
             }
-            //console.log(PICK_LIST_TEAM_KEY.indexOf(String(RECORDS[i][TEAM_INDEX])));
+
+            // If the pick list contains the team & it has a color assigned,
+            // give the data cell the correct color border
             if (PICK_LIST_TEAM_KEY.indexOf(String(RECORDS[i][TEAM_INDEX])) != -1) {
                 if (PICK_LIST_OBJECTS[PICK_LIST_TEAM_KEY.indexOf(String(RECORDS[i][TEAM_INDEX]))].getColor() != 0) {
-                    temp.style.boxShadow = `inset 0px 0px 0.15vh 0.35vh ${teamColors[PICK_LIST_OBJECTS[PICK_LIST_TEAM_KEY.indexOf(String(RECORDS[i][TEAM_INDEX]))].getColor() - 1]}`;
+                    tempDataValue.style.boxShadow = `inset 0px 0px 0.15vh 0.35vh ${teamColors[PICK_LIST_OBJECTS[PICK_LIST_TEAM_KEY.indexOf(String(RECORDS[i][TEAM_INDEX]))].getColor() - 1]}`;
                 }
             } else {
+                // Otherwise that's not good because it should be there uh oh!
                 console.error("Team '" + String(RECORDS[i][TEAM_INDEX]) + "' not found in pick list :(");
             }
-            if (FIELDS[s].includes("Placement")) {
-                temp.innerText = "{ Show Grid }";
-                temp.id = i;
-                temp.classList.add(s);
-                temp.onclick = function () { showGrid(this.id, this.classList[1], RECORDS) }
-                temp.addEventListener("click", function () {
-                    setRowHighlight(this.id, true);
-                });
-            } else if (FIELDS[s].includes("Comments")) {
-                temp.innerText = "{ View }";
-                temp.id = i;
-                temp.classList.add(s);
-                temp.onclick = function () { showCommentModal(RECORDS[this.id][this.classList[1]]) }
-                temp.addEventListener("click", function () {
+
+            // Special cases where clicking does another behavior, such as opening comments section
+            if (FIELDS[s].includes("Comments")) {
+                tempDataValue.innerText = "{ View }";
+                tempDataValue.id = i;
+                tempDataValue.classList.add(s);
+                tempDataValue.onclick = function () { showCommentModal(RECORDS[this.id][this.classList[1]]) }
+                tempDataValue.addEventListener("click", function () {
                     setRowHighlight(this.id, true);
                 });
             } else {
-                temp.innerText = RECORDS[i][s];
-                temp.addEventListener("click", function () {
+                // Otherwise highlight the correct row
+                tempDataValue.innerText = RECORDS[i][s];
+                // id is the row the cell is in
+                tempDataValue.addEventListener("click", function () {
                     setRowHighlight(this.id, false);
                 });
             }
-            rawTable.children[s].appendChild(temp);
+            rawTable.children[s].appendChild(tempDataValue);
         }
     }
 }
@@ -446,7 +449,7 @@ function showCommentModal(text) {
 }
 
 window.onclick = function (event) {
-    if (event.target == closeCommentModal) {
+    if (event.target == commentModal) {
         commentModal.style.display = "none";
     }
 }
@@ -455,10 +458,14 @@ closeCommentModal.onclick = function () {
     commentModal.style.display = "none";
 }
 
+// Sets the row highlight in the team data table
 function setTeamRowHighlight(row, always) {
+    // Team column html elements
     let cols = document.getElementsByClassName("column");
-    for (var c = 0; c < cols.length; c++) {
-        for (var i = 1; i < cols[c].children.length; i++) {
+    
+    // Resets the column highlights back to normal every 3rd striped
+    for (let c = 0; c < cols.length; c++) {
+        for (let i = 1; i < cols[c].children.length; i++) {
             if ((i - 1) % 3 == 0) {
                 cols[c].children[i].style.backgroundColor = "#302f2b";
             } else {
@@ -467,24 +474,31 @@ function setTeamRowHighlight(row, always) {
         }
     }
 
+    // If the previously highlighted row was different than the currently highlighted row
+    // Or it's a special always highlight (for comments and stuff)
     if (localStorage.getItem("previousHighlightRow") != row || always) {
         localStorage.setItem("previousHighlightRow", row);
-        for (var i = 0; i < TEAM_ROWS.length; i++) {
+        // Loop through the team rows and try to match the team number to the desired team number to highlight
+        for (let i = 0; i < TEAM_ROWS.length; i++) {
             if (cols[0].children[i + 1].innerText == TEAMS[row]) {
-                for (var c = 0; c < cols.length; c++) {
+                // When a match is found iterate through all columns highlighting the correct data cell
+                for (let c = 0; c < cols.length; c++) {
                     cols[c].children[i + 1].style.setProperty("background-color", "#a8652d", "important");
                 }
+                // Now break because we already found the correct row to highlight
+                break;
             }
         }
     } else {
+        // Otherwise the highlight should be toggled off, reset previous highlight row
         localStorage.setItem("previousHighlightRow", -1);
     }
 }
 
 function setRowHighlight(row, always) {
     let cols = document.getElementsByClassName("column");
-    for (var c = 0; c < cols.length; c++) {
-        for (var i = 1; i < cols[c].children.length; i++) {
+    for (let c = 0; c < cols.length; c++) {
+        for (let i = 1; i < cols[c].children.length; i++) {
             if ((i - 1) % 3 == 0) {
                 cols[c].children[i].style.backgroundColor = "#302f2b";
             } else {
@@ -495,12 +509,8 @@ function setRowHighlight(row, always) {
 
     if (localStorage.getItem("previousHighlightRow") != row || always) {
         localStorage.setItem("previousHighlightRow", row);
-        for (var c = 0; c < cols.length; c++) {
-            for (var i = 1; i < cols[c].children.length; i++) {
-                if (i - 1 == row) {
-                    cols[c].children[i].style.setProperty("background-color", "#a8652d", "important");
-                }
-            }
+        for (let c = 0; c < cols.length; c++) {
+            cols[c].children[parseInt(row)+1].style.setProperty("background-color", "#a8652d", "important");
         }
     } else {
         localStorage.setItem("previousHighlightRow", -1);
