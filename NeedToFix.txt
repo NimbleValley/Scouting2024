@@ -10,6 +10,8 @@ Generally remove every reference to a grid
 
 ---- NEW FEATURES ----
 
+Add features to pick list tab, such as data comparisons & auto sort
+
 Make autos more stimulating, maybe a drag and drop to visualize paths???
 
 
