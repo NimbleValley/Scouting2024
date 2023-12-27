@@ -180,7 +180,7 @@ const tbaOptions = {
 }
 // Gets event list of current year
 const Year = new Date().getFullYear();
-getTBA(`https://www.thebluealliance.com/api/v3/events/${Year}`, 1);
+getEventListTBA(`https://www.thebluealliance.com/api/v3/events/${Year}`);
 
 
 
@@ -2166,39 +2166,39 @@ function closePickListSortModal() {
     sortPickListModal.style.display = "none";
 }
 
+// Gets the team data & populates team data grid
 function getTeamData() {
+    // Hide all other tabs, resets arrays
     breakdownLines.style.display = "none";
     graphContainer.style.display = "none";
     pickListContainer.style.display = "none";
     breakdownGrid.style.display = "none";
 
-    TABLE_TYPE = "team";
     rawTable.innerHTML = "";
     TEAM_COLUMNS = [];
     TEAM_ROWS = [];
     TEAM_FIELDS = [];
+    TEAMS = [];
 
-    var dataToKeep = [];
-    var dCounter = 0;
-    for (var i = 0; i < FIELDS.length; i++) {
-        var dataType = 1;
+    // Data that is numerical & will be included in team data grid
+    let dataToKeep = [];
+
+    // Iterate through all fields, if the data is numerical, add to dataToKeep array
+    for (let i = 0; i < FIELDS.length; i++) {
+        let dataType = 1;
         if (RECORDS.length > 0) {
             dataType = new String(RECORDS[0][i]).substring(0, 1);
         }
-        if (detectCharacter(dataType) == 1 && FIELDS[i] != "Match Number" && !FIELDS[i].includes("Placement")) {
-            dataToKeep[dCounter] = i - 1;
-            dCounter++;
+        // Special case is match number, that would obviously be useless to round & use haha
+        if (detectCharacter(dataType) == 1 && FIELDS[i] != "Match Number") {
+            dataToKeep.push(i - 1);
             TEAM_FIELDS.push(FIELDS[i]);
         }
     }
-    console.log(dataToKeep);
 
-    TEAMS = [];
-    var tCounter = 0;
     for (var i = 0; i < RECORDS.length; i++) {
         if (!TEAMS.includes(RECORDS[i][TEAM_INDEX]) && RECORDS[i][TEAM_INDEX] != null && RECORDS[i][TEAM_INDEX] != "?") {
-            TEAMS[tCounter] = RECORDS[i][TEAM_INDEX];
-            tCounter++;
+            TEAMS.push(RECORDS[i][TEAM_INDEX]);
         }
     }
 
@@ -2296,22 +2296,7 @@ function getTeamData() {
     setRowHighlight(parseInt(localStorage.getItem("previousHighlightRow")), true);
 }
 
-function openTeamComments(id, oldId, element) {
-    var tempComment = document.createElement("div");
-    tempComment.innerText = TEAM_ROWS[id][TEAM_COLUMNS.length - 1];
-    tempComment.classList.add("team-comments");
-    element.appendChild(tempComment);
-
-    previousTeamComment = id;
-}
-
-function closeTeamComments(id, oldId, element) {
-    var tempText = TEAMS[id];
-    element.innerHTML = "";
-    element.innerText = tempText;
-    previousTeamComment = -1;
-}
-
+// Fetches all matches from specified event, adds video link if available
 function getTeamMatchesTBA(url) {
     fetch(url, tbaOptions)
         .then((response) => response.json())
@@ -2320,7 +2305,7 @@ function getTeamMatchesTBA(url) {
             let tempCommentContainer = document.getElementById("breakdown-comment-container");
             let tempLinkContainer = document.createElement("div");
             tempLinkContainer.id = "team-link-container";
-            for (var i = 0; i < json.length; i++) {
+            for (let i = 0; i < json.length; i++) {
                 let tempMatchText = document.createElement("a");
                 tempMatchText.className = "breakdown-comment";
                 tempMatchText.text = "Qual " + json[i].match_number;
@@ -2339,111 +2324,40 @@ function getTeamMatchesTBA(url) {
         });
 }
 
-function getTBA(url, type) {
-    breakdownLines.style.display = "none";
-    pickListContainer.style.display = "none";
-    graphContainer.style.display = "none";
-
+// Gets all events & populates event select with them
+function getEventListTBA(url) {
     fetch(url, tbaOptions)
         .then((response) => response.json())
         .then((json) => {
-            if (type == 0) {
-                TBA_EVENT_KEYS = json;
-            } else if (type == 1) {
-                console.log(json.length);
-                eventSelect.innerHTML = "";
-                for (var i = 0; i < json.length; i++) {
-                    TBA_EVENT_NAMES[i] = json[i].name;
-                    var tempO = document.createElement("option");
-                    tempO.innerText = json[i].name;
-                    tempO.value = json[i].key;
-                    if (json[i].key == localStorage.getItem("event-key")) {
-                        tempO.selected = "selected";
-                    }
-                    eventSelect.appendChild(tempO);
-                    if (TBA_EVENT_NAMES[i].length > 25) {
-                        TBA_EVENT_NAMES[i] = TBA_EVENT_NAMES[i].substring(0, 25);
-                    }
+            console.log(json.length);
+            eventSelect.innerHTML = "";
+            // Sorts the array (smartly called 'json' for some reason) by object property name
+            json = json.sort((a, b) => (a.name > b.name ? 1 : -1));
+            for (var i = 0; i < json.length; i++) {
+                TBA_EVENT_NAMES[i] = json[i].name;
+                var tempOption = document.createElement("option");
+                tempOption.innerText = json[i].name;
+                tempOption.value = json[i].key;
+                if (json[i].key == localStorage.getItem("event-key")) {
+                    tempOption.selected = "selected";
                 }
-            } else if (type == 2) {
-                getTBAOPRS(json);
+                eventSelect.appendChild(tempOption);
+
+                // Shorten event name if it's ridiculously long
+                if (TBA_EVENT_NAMES[i].length > 25) {
+                    TBA_EVENT_NAMES[i] = TBA_EVENT_NAMES[i].substring(0, 25);
+                }
             }
+
         });
 }
 
-function getTBAOPRS(json) {
-    rawTable.innerHTML = "";
-    for (var h = 0; h < 4; h++) {
-        var col = document.createElement("div");
-        var temp = document.createElement("div");
-
-        var text = document.createElement("h3");
-        temp.appendChild(text);
-
-        temp.className = "table-header-section-raw";
-
-        temp.id = 1;
-        temp.classList.add(`${(h)}`);
-        //console.log(temp.classList);
-        //temp.classList.add(h - 1);
-        temp.onclick = function () { sortColumn(this.classList[1], detectCharacter(this.id), COLUMNS, false) };
-
-        col.className = "column";
-        if (h % 2 == 0) {
-            col.style.backgroundColor = "#4d473f";
-        }
-        col.appendChild(temp);
-        rawTable.appendChild(col);
-    }
-
-    for (var i = 0; i < 4; i++) {
-        rawTable.children[i].children[0].innerText = oprHeaders[i];
-    }
-
-    localStorage.setItem("direction", 0);
-    localStorage.setItem("column", -1);
-
-    //var tempArray = JSON.parse(json);
-    //console.log(tempArray);
-
-    var entries = Object.entries(json);
-
-    console.log(Object.entries(Object.entries(entries[0])[1][1])[1][0]);
-    console.log(entries[0]);
-
-    for (var i = 0; i < Object.entries(Object.entries(entries[0])[1][1]).length; i++) {
-        var temp = document.createElement("div");
-        var teamCode = Object.entries(Object.entries(entries[0])[1][1])[i][0];
-        temp.className = "data-value"
-        temp.innerText = teamCode.substring(3);
-        rawTable.children[0].appendChild(temp);
-    }
-
-    for (var headerKey = 0; headerKey < 3; headerKey++) {
-        //console.log(Object.keys(keys[headerKey]));
-        var innerEntries = Object.entries(Object.entries(entries[headerKey])[1][1]);
-        console.log(innerEntries);
-        for (var innerKey = 0; innerKey < innerEntries.length; innerKey++) {
-            console.log(innerEntries[innerKey]);
-            var temp = document.createElement("div");
-            temp.className = "data-value"
-            temp.innerText = Math.floor(innerEntries[innerKey][1] * 100) / 100;
-            rawTable.children[headerKey + 1].appendChild(temp);
-        }
-    }
-}
-
-function getTBATeams() {
-    console.log(eventSelect.value);
-    getTBA(`https://www.thebluealliance.com/api/v3/event/${eventSelect.value}/oprs`, 2);
-}
-
-async function toggleSettings() {
+// Toggles settings tab
+function toggleSettings() {
     settingsOpen = !settingsOpen;
     if (settingsOpen) {
         settings.style.display = "flex";
         body.style.overflow = "hidden";
-        console.log(TBA_EVENT_NAMES);
     } else {
         settings.style.display = "none";
         body.style.overflow = "auto";

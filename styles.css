@@ -636,6 +636,10 @@ p {
     border: 0.55vh solid rgb(104, 102, 102);
 }
 
+
+/* SETTINGS TAB */
+
+
 #settings {
     position: fixed;
     left: 0;
@@ -660,6 +664,19 @@ p {
     align-items: center;
     padding-top: 1vh;
     flex-direction: column;
+}
+
+.setting-label {
+    color: white;
+    font-size: 3vh;
+    margin-bottom: 1.5vh;
+}
+
+.vertical-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 h5 {
@@ -1538,84 +1555,6 @@ h6 {
 
 
 
-
-
-
-#cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    width: calc(100% - 4vh);
-    margin-left: 1vh;
-    margin-right: 1vh;
-    margin-top: 1vh;
-    height: fit-content;
-}
-
-#cards:hover>.card::after {
-    opacity: 1;
-}
-
-.card {
-    background-color: rgba(255, 255, 255, 0.356);
-    border-radius: 0.75vh;
-    cursor: pointer;
-    display: flex;
-    font-size: 3.5vh;
-    color: rgb(235, 230, 225);
-    height: fit-content;
-    flex-direction: column;
-    position: relative;
-    width: 100%;
-    height: 8.75vh;
-    position: relative;
-}
-
-.card:hover::before {
-    opacity: 1;
-}
-
-.card::before,
-.card::after {
-    border-radius: inherit;
-    content: "";
-    height: 100%;
-    left: 0px;
-    opacity: 0;
-    position: absolute;
-    top: 0px;
-    transition: opacity 250ms;
-    width: 100%;
-}
-
-.card::before {
-    background: radial-gradient(125vh circle at var(--mouse-x) var(--mouse-y),
-            rgba(255, 255, 255, 0.345),
-            transparent 40%);
-    z-index: 3;
-}
-
-.card::after {
-    background: radial-gradient(100vh circle at var(--mouse-x) var(--mouse-y),
-            rgba(255, 255, 255, 0.61),
-            transparent 40%);
-    z-index: 1;
-}
-
-.card>.card-content {
-    background-color: var(--card-color);
-    border-radius: inherit;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    inset: 0.35vh;
-    padding: 10px;
-    position: absolute;
-    z-index: 2;
-    justify-content: center;
-    align-items: center;
-    font-weight: 700;
-}
 
 
 

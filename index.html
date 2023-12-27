@@ -40,7 +40,10 @@
         <div id="settings-interior">
             <h5>Settings</h5>
             <select name="event" id="event-select"></select>
-            <input type="text" id="spreadsheet-url-input">
+            <div class="vertical-container">
+                <label for="spreadsheet-url-input" class="setting-label">Raw Data URL:</label>
+                <input type="text" id="spreadsheet-url-input">
+            </div>
             <h5 id="settings-back" onclick="toggleSettings()">Back</h5>
         </div>
     </div>
@@ -83,9 +86,9 @@
             <span class="close-pick-list-sort-modal" onclick="closePickListSortModal()">&times;</span>
             <p>Select statistic to sort by:</p>
             <div class="container">
-            <div class="pick-list-sort-button" onclick="sortPickList(1)">Auto Points</div>
-            <div class="pick-list-sort-button" onclick="sortPickList(2)">Tele Points</div>
-            <div class="pick-list-sort-button" onclick="sortPickList(13)">Total Points</div>
+                <div class="pick-list-sort-button" onclick="sortPickList(1)">Auto Points</div>
+                <div class="pick-list-sort-button" onclick="sortPickList(2)">Tele Points</div>
+                <div class="pick-list-sort-button" onclick="sortPickList(13)">Total Points</div>
             </div>
         </div>
     </div>
