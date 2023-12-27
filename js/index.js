@@ -1246,105 +1246,6 @@ function openTeamBreakdowns() {
 
     tempFeedbackContainer.appendChild(tempWarningContainer);
 
-    let tempGridContainer = document.createElement("div");
-    tempGridContainer.id = "breakdown-grid-container";
-
-    let tempGridHighContainer = document.createElement("div");
-    tempGridHighContainer.className = "breakdown-grid-row-container";
-
-    let tempGridMidContainer = document.createElement("div");
-    tempGridMidContainer.className = "breakdown-grid-row-container";
-
-    let tempGridLowContainer = document.createElement("div");
-    tempGridLowContainer.className = "breakdown-grid-row-container";
-
-    // Grid data from all matches
-    let team_tele_grid_values = [];
-
-    // Tele loop
-    for (var g = 0; g < RECORDS.length; g++) {
-        if (RECORDS[g][TEAM_INDEX] == document.getElementById("team-breakdown-select").value) {
-            let numCubesHigh = 0;
-            let numConesHigh = 0;
-            let numCubesMid = 0;
-            let numConesMid = 0;
-            let numCubesLow = 0;
-            let numConesLow = 0;
-            let tempGrid = JSON.parse("[" + RECORDS[g][5] + "]");
-
-            //team_record_matches.push(RECORDS[g][2]);
-            for (var node = 0; node < tempGrid.length; node++) {
-                if (node % 9 >= 6) {
-                    // High Pieces
-                    //console.log(tempGrid[node]);
-                    if (tempGrid[node] == 1) {
-                        numCubesHigh++;
-                    } else if (tempGrid[node] == 2) {
-                        numConesHigh++;
-                    }
-                } else if (node % 9 < 6 && node % 9 >= 3) {
-                    // Mid pieces
-                    //console.log(tempGrid[node]);
-                    if (tempGrid[node] == 1) {
-                        numCubesMid++;
-                    } else if (tempGrid[node] == 2) {
-                        numConesMid++;
-                    }
-                } else {
-                    // Low pieces
-                    //console.log(tempGrid[node]);
-                    if (tempGrid[node] == 1) {
-                        numCubesLow++;
-                    } else if (tempGrid[node] == 2) {
-                        numConesLow++;
-                    }
-                }
-            }
-            tempGrid = JSON.parse("[" + RECORDS[g][3] + "]");
-
-            //team_record_matches.push(RECORDS[g][2]);
-            for (var node = 0; node < tempGrid.length; node++) {
-                if (node % 9 >= 6) {
-                    // High Pieces
-                    //console.log(tempGrid[node]);
-                    if (tempGrid[node] == 1) {
-                        numCubesHigh++;
-                    } else if (tempGrid[node] == 2) {
-                        numConesHigh++;
-                    }
-                } else if (node % 9 < 6 && node % 9 >= 3) {
-                    // Mid pieces
-                    //console.log(tempGrid[node]);
-                    if (tempGrid[node] == 1) {
-                        numCubesMid++;
-                    } else if (tempGrid[node] == 2) {
-                        numConesMid++;
-                    }
-                } else {
-                    // Low pieces
-                    //console.log(tempGrid[node]);
-                    if (tempGrid[node] == 1) {
-                        numCubesLow++;
-                    } else if (tempGrid[node] == 2) {
-                        numConesLow++;
-                    }
-                }
-            }
-            let outputHigh = [numCubesHigh, numConesHigh];
-            let outputMid = [numCubesMid, numConesMid];
-            let outputLow = [numCubesLow, numConesLow];
-            let output = [outputHigh, outputMid, outputLow];
-            team_tele_grid_values.push(output);
-        }
-    }
-
-    let numHighCubes = 0;
-    let numHighCones = 0;
-    let numMidCubes = 0;
-    let numMidCones = 0;
-    let numLowCubes = 0;
-    let numLowCones = 0;
-
     /*
         [ Matches [ High, Mid, Low [ Cubes, Cones ] ] ]
     */
@@ -2178,12 +2079,14 @@ function getTeamData() {
     TEAM_COLUMNS = [];
     TEAM_ROWS = [];
     TEAM_FIELDS = [];
-    TEAMS = [];
+
+    // Updates array of teams
+    getTeamList();
 
     // Data that is numerical & will be included in team data grid
     let dataToKeep = [];
 
-    // Iterate through all fields, if the data is numerical, add to dataToKeep array
+    // Iterate through all fields, if the data is numerical, add field index to dataToKeep array
     for (let i = 0; i < FIELDS.length; i++) {
         let dataType = 1;
         if (RECORDS.length > 0) {
@@ -2196,104 +2099,132 @@ function getTeamData() {
         }
     }
 
+    // Iterates through all fields (columns), creates field headers & columns
+    for (let i = 0; i < dataToKeep.length; i++) {
+        // Creates column html element
+        let tempColumn = document.createElement("div");
+        tempColumn.className = "column";
+
+        // Temp header html element
+        let tempHeader = document.createElement("div");
+
+        let text = document.createElement("h3");
+        text.innerText = FIELDS[dataToKeep[i] + 1];
+        tempHeader.appendChild(text);
+        tempHeader.className = "table-header-section-raw";
+        tempHeader.classList.add(`${(i)}`);
+        tempColumn.appendChild(tempHeader);
+
+        rawTable.appendChild(tempColumn);
+    }
+    // Where in the world did I set the highlight I'm falling asleep :(
+
+    // Creates new 2d arrays
+    for (let g = 0; g < dataToKeep.length + 1; g++) {
+        TEAM_COLUMNS[g] = new Array();
+    }
+    for (let t = 0; t < TEAMS.length; t++) {
+        TEAM_ROWS[t] = new Array();
+    }
+
+    // Iterates through every team (basically makes each row)
+    for (let i = 0; i < TEAMS.length; i++) {
+        // List of every row of raw data for team
+        let teamRows = [];
+
+        // If the record team equals current team, add the raw data row index to array
+        for (let t = 0; t < RECORDS.length; t++) {
+            if (RECORDS[t][TEAM_INDEX] == TEAMS[i]) {
+                teamRows.push(t);
+            }
+        }
+
+        // Iterates through every column
+        for (let c = 0; c < dataToKeep.length; c++) {
+            // Average for the current column/field
+            let average = 0;
+
+            // Adds all of the team's rows in current column together, so we can everage it later
+            for (let r = 0; r < teamRows.length; r++) {
+                average += parseInt(RECORDS[teamRows[r]][dataToKeep[c] + 1]);
+            }
+
+            // Temp data value html element
+            let tempData = document.createElement("div");
+            tempData.className = "data-value";
+            tempData.classList.add(i);
+            tempData.id = i;
+
+            // Averages each data value, sets the text
+            average = Math.floor(average / teamRows.length * 10) / 10;
+            tempData.innerText = average;
+
+            // If it's the team data value, then show comment modal on click, otherwise just do normal highlight toggle
+            if (c == 0) {
+                tempData.addEventListener("click", function () {
+                    // Always highlight, so it's easy to see what team you clicked on
+                    setTeamRowHighlight(parseInt(this.classList[1]), true);
+                    showCommentModal(TEAM_ROWS[this.id][TEAM_COLUMNS.length - 1]);
+                });
+            } else {
+                tempData.addEventListener("click", function () {
+                    // Toggle highlight
+                    setTeamRowHighlight(parseInt(this.classList[1]), false);
+                });
+            }
+            
+            // If pick list contains team & team has color, set the border to correct color
+            if (PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i])) != -1) {
+                if (PICK_LIST_OBJECTS[PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i]))].getColor() != 0) {
+                    tempData.style.boxShadow = `inset 0px 0px 0.15vh 0.35vh ${teamColors[PICK_LIST_OBJECTS[PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i]))].getColor() - 1]}`;
+                }
+            }
+
+            rawTable.children[c].appendChild(tempData);
+
+            // Average out the data
+            TEAM_COLUMNS[c][i] = average;
+            TEAM_ROWS[i][c] = average;
+        }
+
+        // Temp comment text
+        let tempComment = "";
+        for (let q = 0; q < RECORDS.length; q++) {
+            // Find all comments for current team, add to variable
+            if (RECORDS[q][TEAM_INDEX] == TEAMS[i]) {
+                tempComment += RECORDS[q][FIELDS.indexOf("Comments")] + "\n";
+            }
+        }
+
+        // Add comment text to correct position
+        TEAM_ROWS[i].push(tempComment);
+        TEAM_COLUMNS[dataToKeep.length].push(tempComment);
+    }
+
+    // Adds click listeners to each header
+    for (let i = 0; i < dataToKeep.length; i++) {
+        document.getElementsByClassName("column")[i].children[0].onclick = function () {
+            sortColumn(this.classList[1], detectCharacter(1), TEAM_ROWS, TEAM_COLUMNS, TEAM_FIELDS, true, true);
+        };
+    }
+
+    // Sets highlight to what it was before
+    setRowHighlight(parseInt(localStorage.getItem("previousHighlightRow")), true);
+}
+
+// Helper function, updates list of teams
+function getTeamList() {
+    TEAMS = [];
+
     for (let i = 0; i < RECORDS.length; i++) {
         if (!TEAMS.includes(RECORDS[i][TEAM_INDEX]) && RECORDS[i][TEAM_INDEX] != null && RECORDS[i][TEAM_INDEX] != "?") {
             TEAMS.push(RECORDS[i][TEAM_INDEX]);
         }
     }
 
+    // Sorts teams by ascending number
     TEAMS.sort((a, b) => a - b);
     console.log(TEAMS);
-    for (var i = 0; i < dataToKeep.length; i++) {
-        var tempC = document.createElement("div");
-        tempC.className = "column";
-
-        var temp = document.createElement("div");
-        var text = document.createElement("h3");
-        if (dataToKeep[i] != -5) {
-            text.innerText = FIELDS[dataToKeep[i] + 1];
-        }
-        temp.appendChild(text);
-        temp.className = "table-header-section-raw";
-        temp.id = 9;
-        temp.classList.add(`${(i)}`);
-        tempC.appendChild(temp);
-
-        rawTable.appendChild(tempC);
-    }
-    // Where in the world did I set the highlight I'm falling asleep :(
-
-    for (let g = 0; g < dataToKeep.length + 1; g++) {
-        TEAM_COLUMNS[g] = new Array();
-    }
-
-    for (let t = 0; t < TEAMS.length; t++) {
-        TEAM_ROWS[t] = new Array();
-    }
-
-    for (let i = 0; i < TEAMS.length; i++) {
-        var teamRows = [];
-        var rCounter = 0;
-        for (let t = 0; t < RECORDS.length; t++) {
-            if (RECORDS[t][TEAM_INDEX] == TEAMS[i]) {
-                teamRows[rCounter] = t;
-                rCounter++;
-            }
-        }
-        for (let c = 0; c < dataToKeep.length; c++) {
-            var average = 0;
-            for (var r = 0; r < teamRows.length; r++) {
-                average += parseInt(RECORDS[teamRows[r]][dataToKeep[c] + 1]);
-            }
-            var tempData = document.createElement("div");
-            tempData.className = "data-value";
-            tempData.classList.add(i);
-            tempData.id = i;
-            if (c == 0) {
-                if (c == 0) {
-                    tempData.innerText = Math.floor(average / teamRows.length * 10) / 10;
-                }
-
-                tempData.addEventListener("click", function () {
-                    setTeamRowHighlight(parseInt(this.classList[1]), true);
-                    showCommentModal(TEAM_ROWS[this.id][TEAM_COLUMNS.length - 1]);
-                });
-            } else {
-                tempData.innerText = Math.floor(average / teamRows.length * 10) / 10;
-                tempData.addEventListener("click", function () {
-                    setTeamRowHighlight(parseInt(this.classList[1]), false);
-                });
-            }
-            //console.log(PICK_LIST_OBJECTS[PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i]))]);
-            if (PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i])) != -1) {
-                if (PICK_LIST_OBJECTS[PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i]))].getColor() != 0) {
-                    tempData.style.boxShadow = `inset 0px 0px 0.15vh 0.35vh ${teamColors[PICK_LIST_OBJECTS[PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i]))].getColor() - 1]}`;
-                    //console.log(tempData.style.backgroundColor);
-                }
-            }
-            tempData.id = i;
-            rawTable.children[c].appendChild(tempData);
-            // Flashback to 2023 charged up lol
-            if (true) {
-                TEAM_COLUMNS[c][i] = Math.floor(average / teamRows.length * 10) / 10;
-                TEAM_ROWS[i][c] = Math.floor(average / teamRows.length * 10) / 10;
-            }
-        }
-        var tempComment = "";
-        for (var q = 0; q < RECORDS.length; q++) {
-            if (RECORDS[q][TEAM_INDEX] == TEAMS[i]) {
-                tempComment += RECORDS[q][FIELDS.indexOf("Comments")] + "\n";
-            }
-        }
-        TEAM_ROWS[i].push(tempComment);
-        TEAM_COLUMNS[dataToKeep.length].push(tempComment);
-    }
-    for (var i = 0; i < dataToKeep.length; i++) {
-        document.getElementsByClassName("column")[i].children[0].onclick = function () {
-            sortColumn(this.classList[1], detectCharacter(1), TEAM_ROWS, TEAM_COLUMNS, TEAM_FIELDS, true, true);
-        };
-    }
-    setRowHighlight(parseInt(localStorage.getItem("previousHighlightRow")), true);
 }
 
 // Fetches all matches from specified event, adds video link if available
