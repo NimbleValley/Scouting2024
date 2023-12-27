@@ -2196,7 +2196,7 @@ function getTeamData() {
         }
     }
 
-    for (var i = 0; i < RECORDS.length; i++) {
+    for (let i = 0; i < RECORDS.length; i++) {
         if (!TEAMS.includes(RECORDS[i][TEAM_INDEX]) && RECORDS[i][TEAM_INDEX] != null && RECORDS[i][TEAM_INDEX] != "?") {
             TEAMS.push(RECORDS[i][TEAM_INDEX]);
         }
