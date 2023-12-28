@@ -1143,6 +1143,7 @@ async function openTeamBreakdowns() {
         getTeamData();
     }
 
+    // FIXME idk if firstBreakdown is even needed
     // Bad way to do this but if it's the first time then run setUpTeamBreakdowns
     if (firstbreakdown) {
         setUpTeamBreakdowns();
@@ -1288,8 +1289,8 @@ async function openTeamBreakdowns() {
             // TODO CHANGE
             
             // FIXME ADD LETERS IN HERE TO SET AUTO BASED ON POINTS & STUFF
-
-            console.warn(tempAuto);
+            team_auto_success.push(1);
+            team_auto_types.push(tempAuto);
         }
     }
 
@@ -1920,7 +1921,6 @@ function closePickListSortModal() {
     sortPickListModal.style.display = "none";
 }
 
-// Gets the team data & populates team data grid
 function getTeamData() {
     // Hide all other tabs, resets arrays
     breakdownLines.style.display = "none";

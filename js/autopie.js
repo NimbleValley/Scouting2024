@@ -1,4 +1,8 @@
+
+// Creates auto pie chart
 function runAutoPie(autoTypes, autoSuccess) {
+
+    // TODO Change for 2024
     const autoNames = ["A1pC", "A1pCM", "A2pCM", "A3pCM", "A1p", "A1pM", "A2pM", "A3pM", "A", "AM", "AC", "ACM"];
     const autoNameKeys = ["1P with Charge", "1P with Charge & Mobility", "2P with Charge and Mobility", "3P with Charge and Mobility", "1 Piece", "1P with Mobility", "2P with Mobility", "3P with Mobility", "No auto", "Only Mobility", "Only Charge", "Charge with Mobility"];
 

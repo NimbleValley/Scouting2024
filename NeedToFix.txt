@@ -1,12 +1,11 @@
 ---- ISSUES ----
 
+Breakdowns take too long to run, why is the setup called multiple times? 
+Also team data doesn't need to populate rows for breakdown, useless waste of time 
+
 Team highlight automatically highlights headers in team data tab
 
-Breakdowns don't work
-
 Generally remove every reference to a grid
-
-Remove unused parameter 'team' in function getSortedIndex
 
 
 
