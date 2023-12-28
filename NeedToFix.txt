@@ -6,6 +6,8 @@ Breakdowns don't work
 
 Generally remove every reference to a grid
 
+Remove unused parameter 'team' in function getSortedIndex
+
 
 
 ---- NEW FEATURES ----

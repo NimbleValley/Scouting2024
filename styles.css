@@ -714,7 +714,7 @@ select {
 
 select:hover {
     cursor: pointer;
-    background-color: #bbbaba;
+    background-color: #bbbaba !important;
     color: #161311;
 }
 
@@ -982,6 +982,10 @@ h2 {
 #team-breakdown-select {
     width: 30vh;
     height: 8vh;
+    position: sticky;
+    left: 30vh;
+    background-color: #000000;
+    z-index: 100;
 }
 
 h8 {

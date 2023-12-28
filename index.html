@@ -53,12 +53,12 @@
             <div class="side-button" onclick="refreshData()">Refresh</div>
             <div class="side-button active" onclick="resetRaw()">Raw</div>
             <div class="side-button" onclick="getTeamData()">Team</div>
-            <div class="side-button" onclick="openTeamBreakdowns(); openTeambreakdowns();">Breakdown</div>
+            <!-- FIXME MIGHT HAVE TO CALL openTeamBreakdowns() twice for some reason, not sure why--> 
+            <div class="side-button" onclick="openTeamBreakdowns();">Breakdown</div>
             <div class="side-button" onclick="setUpGraph()">Graph</div>
             <div class="side-button" onclick="setUpCompare()">Compare</div>
             <div class="side-button" onclick="setUpMatches()">Matches</div>
             <div class="side-button" onclick="setUpPickList()">Pick List</div>
-            <!--<div class="side-button" onclick="getTBATeams()">TBA</div>-->
             <div class="side-button" onclick="toggleSettings()">Settings</div>
         </div>
         <div id="open-sidebar" onclick="toggleSidebar()">

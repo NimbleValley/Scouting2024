@@ -93,6 +93,8 @@ var TEAMS_DUMB = new Array();
 // Array of how many times each team drove reckless
 var TEAMS_RECKLESS = new Array();
 
+const warningTypes = ["Flip/s", "Comm Issue/s", "Disabled", "Unintelligent", "Reckless"];
+
 
 // TODO document this section
 var PICK_LIST = new Array();
@@ -255,7 +257,6 @@ function getPickList() {
             }
         }
         console.log(PICK_LIST_OBJECTS);
-        //openTeamBreakdowns();
         resetRaw();
     }).catch(error => {
         console.log(error);
@@ -445,6 +446,7 @@ function resetRaw() {
     }
 }
 
+// Shows team comment modal, sets correct text
 function showCommentModal(text) {
     // Show modal
     commentModal.style.display = "block";
@@ -452,12 +454,14 @@ function showCommentModal(text) {
     commentModal.children[0].children[1].innerText = text;
 }
 
+// Close comment modal if you click off of it
 window.onclick = function (event) {
     if (event.target == commentModal) {
         commentModal.style.display = "none";
     }
 }
 
+// Close comment modal when close button is clicked
 closeCommentModal.onclick = function () {
     commentModal.style.display = "none";
 }
@@ -499,6 +503,7 @@ function setTeamRowHighlight(row, always) {
     }
 }
 
+// Sets row highlight in raw data table
 function setRowHighlight(row, always) {
     //FIXME ROW IS A STRING FOR SOME REASON FIX!!!
 
@@ -524,33 +529,7 @@ function setRowHighlight(row, always) {
     }
 }
 
-function showGrid(recordNum, colNum, record) {
-    // No more sticky instead use fixed ;)
-
-    breakdownLines.style.display = "none";
-    graphContainer.style.display = "none";
-    pickListContainer.style.display = "none";
-
-    body.style.overflow = "hidden";
-    frcGrid.style.display = "flex";
-
-    var nodeData = JSON.parse("[" + record[recordNum][colNum] + "]");
-    console.log(nodeData);
-
-    for (var i = 0; i < gridNodes.length; i++) {
-        //console.log(nodeData[Math.floor(i/9)][i%9]);
-        gridNodes[i].style.backgroundColor = "#797979";
-        console.log((9 - (i % 9)) * ((Math.floor(i / 9) + 1)));
-        if (nodeData[i] > 0) {
-            if (nodeData[i] == 1) {
-                gridNodes[i].style.backgroundColor = "#6643DA";
-            } else {
-                gridNodes[i].style.backgroundColor = "#FDC955";
-            }
-        }
-    }
-}
-
+// Sets up compare tab
 function setUpCompare() {
     getTeamData();
 
@@ -628,6 +607,7 @@ function setUpCompare() {
     doCompare(teamSelects, statContainers);
 }
 
+// Runs compare tab
 function doCompare(teamSelects, statContainers) {
     let teamIndices = [];
 
@@ -1079,6 +1059,7 @@ function doGraph() {
     localStorage.setItem("graph-two", document.getElementById("graph-category-select-two").value);
 }
 
+// Sets up breakdown tab, only runs on first click
 function setUpTeamBreakdowns() {
 
     // Reset stuff
@@ -1155,7 +1136,8 @@ function setUpTeamBreakdowns() {
     document.body.appendChild(breakdownGrid);
 }
 
-function openTeamBreakdowns() {
+// Runs team breakdowns
+async function openTeamBreakdowns() {
     // If there is no team data, then get team data
     if (TEAM_COLUMNS.length < 1) {
         getTeamData();
@@ -1171,40 +1153,46 @@ function openTeamBreakdowns() {
     graphContainer.style.display = "none";
     pickListContainer.style.display = "none";
 
-
-    //console.log(TEAM_COLUMNS);
+    // Stores the percentiles for the given team, 0-1
     let breakdownData = [];
 
     localStorage.setItem("breakdown-team", document.getElementById("team-breakdown-select").value);
 
+    // Iterates through every breakdown category
     for (let i = 0; i < breakdownCategoryHeaders.length; i++) {
-        //console.log(sortIndexes[i]);
-
+        // 2d array, array of teams sorted in each cetegory
         let teamsSorted = [];
-        for (let t = 0; t < getSortedIndex(sortIndexes[i], 456, TEAM_ROWS, TEAM_COLUMNS).length; t++) {
-            teamsSorted[t] = getSortedIndex(sortIndexes[i], 456, TEAM_ROWS, TEAM_COLUMNS)[t][0];
+        for (let t = 0; t < getSortedIndex(sortIndexes[i], TEAM_ROWS, TEAM_COLUMNS).length; t++) {
+            // Adds the orders to array
+            teamsSorted[t] = getSortedIndex(sortIndexes[i], TEAM_ROWS, TEAM_COLUMNS)[t][0];
         }
 
         // Sort the column, return the index that was matched up with the data
+        // Decimal 0-1, 1 being they had the highest, 0 the lowest
         breakdownData[i] = teamsSorted.indexOf(parseInt(document.getElementById("team-breakdown-select").value)) / parseFloat(TEAMS.length - 1);
     }
 
+    // Iterates through lines & sets each line to correct height based on breakdownData
     for (let i = 0; i < breakdownCategoryHeaders.length; i++) {
         document.getElementsByClassName("inner-breakdown-line")[i].style.height = `${breakdownData[i] * 100}% `;
         document.getElementsByClassName("breakdown-popup")[i].innerText = `${(breakdownData[i] * (TEAMS.length - 1)) + 1} out of ${TEAMS.length} `;
     }
+
+    // Container for the top values displayed in breakdowns
     let breakdownDataContainer = document.getElementById("breakdown-data-container");
     breakdownDataContainer.innerHTML = "";
 
-    //document.add('wheel', scrollHorixontal(event));
-
-    for (var i = 1; i < TEAM_COLUMNS.length - 1; i++) {
+    // Iterates through each column, but skips team number
+    for (let i = 1; i < TEAM_COLUMNS.length - 1; i++) {
+        // Rectangular container
         let tempDataContainer = document.createElement("div");
         tempDataContainer.className = "breakdown-data";
 
+        // Text element, holds data
         let tempData = document.createElement("h8");
         tempData.innerText = TEAM_ROWS[TEAMS.indexOf(parseInt(document.getElementById("team-breakdown-select").value))][i];
 
+        // Text element, holds team number
         let tempDataTitle = document.createElement("h9");
         tempDataTitle.innerText = TEAM_FIELDS[i];
 
@@ -1212,12 +1200,16 @@ function openTeamBreakdowns() {
         tempDataContainer.appendChild(tempData);
         breakdownDataContainer.appendChild(tempDataContainer);
     }
+
+    // Container for issues, autos, comments, etc.
     let tempFeedbackContainer = document.getElementById("feedback-container");
     tempFeedbackContainer.innerHTML = "";
 
+    // Container for warnings, child of feedback container
     let tempWarningContainer = document.createElement("div");
     tempWarningContainer.id = "breakdown-warning-container";
 
+    // Title
     let tempWarningTitle = document.createElement("p");
     tempWarningTitle.className = "breakdown-warning-text";
     tempWarningTitle.style.fontWeight = "bold";
@@ -1226,141 +1218,39 @@ function openTeamBreakdowns() {
     tempWarningTitle.innerText = "Issues:";
     tempWarningContainer.appendChild(tempWarningTitle);
 
-    let warningTypes = ["Flip/s", "Comm Issue/s", "Disabled", "Unintelligent", "Reckless"];
+    // 2d array of all team warning arrays
     let compiledWarnings = [TEAMS_FLIPPED, TEAMS_COMMS, TEAMS_DISABLED, TEAMS_DUMB, TEAMS_RECKLESS];
-    for (var w = 0; w < warningTypes.length; w++) {
+
+    // Goes through each warning type
+    for (let w = 0; w < warningTypes.length; w++) {
+        // By default, create new text element with 0 of current warning
         let tempWarningText = document.createElement("p");
         tempWarningText.className = "breakdown-warning-text";
         tempWarningText.innerText = "0 " + warningTypes[w];
+
+        // Check if the team is in the current warning array
         if (compiledWarnings[w].includes(parseInt(document.getElementById("team-breakdown-select").value))) {
+            // Uh oh they are, check how many times they are in this array
             let numOccurances = 0;
-            for (var t = 0; t < compiledWarnings[w].length; t++) {
-                if (compiledWarnings[w][t] == parseInt(document.getElementById("team-breakdown-select").value)) {
+            for (let charlotteCovert = 0; charlotteCovert < compiledWarnings[w].length; charlotteCovert++) {
+                if (compiledWarnings[w][charlotteCovert] == parseInt(document.getElementById("team-breakdown-select").value)) {
                     numOccurances++;
                 }
             }
+            // Now set the text to show how many times they have the issue
             tempWarningText.innerText = numOccurances + " " + warningTypes[w];
         }
+        // Then add it to the correct container
         tempWarningContainer.appendChild(tempWarningText);
     }
 
     tempFeedbackContainer.appendChild(tempWarningContainer);
 
-    /*
-        [ Matches [ High, Mid, Low [ Cubes, Cones ] ] ]
-    */
-
-    for (var i = 0; i < team_tele_grid_values.length; i++) {
-        numHighCubes += team_tele_grid_values[i][0][0];
-        numHighCones += team_tele_grid_values[i][0][1];
-
-        numMidCubes += team_tele_grid_values[i][1][0];
-        numMidCones += team_tele_grid_values[i][1][1];
-
-        numLowCubes += team_tele_grid_values[i][2][0];
-        numLowCones += team_tele_grid_values[i][2][1];
-    }
-
-    numHighCubes /= parseFloat(team_tele_grid_values.length);
-    numHighCones /= parseFloat(team_tele_grid_values.length);
-    numMidCubes /= parseFloat(team_tele_grid_values.length);
-    numMidCones /= parseFloat(team_tele_grid_values.length);
-    numLowCubes /= parseFloat(team_tele_grid_values.length);
-    numLowCones /= parseFloat(team_tele_grid_values.length);
-
-    //console.log(numHighCubes);
-
-    //console.log(team_tele_grid_values)
-    //console.log(team_record_matches)
-
-    //let nodeData = JSON.parse("[" + RECORDS[TEAMS.indexOf(parseInt(document.getElementById("team-breakdown-select").value))][4] + "]");
-    //console.log(nodeData);
-
-    for (var i = 0; i < numHighCubes; i++) {
-        let tempGP = document.createElement("div");
-        tempGP.className = "breakdown-grid-cube";
-        if (i + 1 >= numHighCubes) {
-            if (i + 1 > numHighCubes) {
-                tempGP.style.scale = `${(numHighCubes * 100.0 % 100) / 100.0} 1`;
-            }
-        }
-        tempGridHighContainer.appendChild(tempGP);
-    }
-
-    for (var i = 0; i < numHighCones; i++) {
-        let tempGP = document.createElement("div");
-        tempGP.className = "breakdown-grid-cone";
-        if (i + 1 >= numHighCones) {
-            if (i + 1 > numHighCones) {
-                tempGP.style.scale = `${(numHighCones * 100.0 % 100) / 100.0} 1`;
-            }
-        }
-        tempGridHighContainer.appendChild(tempGP);
-    }
-    let tempHighText = document.createElement("h8");
-    tempHighText.innerHTML = `<span style="color: rgb(133, 85, 255)">${Math.round(numHighCubes * 100) / 100}</span>, <span style="color: rgb(255, 217, 0)">${Math.round(numHighCones * 100) / 100}</span>`;
-    tempGridHighContainer.appendChild(tempHighText);
-
-    for (var i = 0; i < numMidCubes; i++) {
-        let tempGP = document.createElement("div");
-        tempGP.className = "breakdown-grid-cube";
-        if (i + 1 >= numMidCubes) {
-            if (i + 1 > numMidCubes) {
-                tempGP.style.scale = `${(numMidCubes * 100.0 % 100) / 100.0} 1`;
-            }
-        }
-        tempGridMidContainer.appendChild(tempGP);
-    }
-
-    for (var i = 0; i < numMidCones; i++) {
-        let tempGP = document.createElement("div");
-        tempGP.className = "breakdown-grid-cone";
-        if (i + 1 >= numMidCones) {
-            if (i + 1 > numMidCones) {
-                tempGP.style.scale = `${(numMidCones * 100.0 % 100) / 100.0} 1`;
-            }
-        }
-        tempGridMidContainer.appendChild(tempGP);
-    }
-
-    let tempMidText = document.createElement("h8");
-    tempMidText.innerHTML = `<span><span style="color: rgb(133, 85, 255)">${Math.round(numMidCubes * 100) / 100}</span>, <span style="color: rgb(255, 217, 0)">${Math.round(numMidCones * 100) / 100}</span></span>`;
-    tempGridMidContainer.appendChild(tempMidText);
-
-    for (var i = 0; i < numLowCubes; i++) {
-        let tempGP = document.createElement("div");
-        tempGP.className = "breakdown-grid-cube";
-        if (i + 1 >= numLowCubes) {
-            if (i + 1 > numLowCubes) {
-                tempGP.style.scale = `${(numLowCubes * 100.0 % 100) / 100.0} 1`;
-            }
-        }
-        tempGridLowContainer.appendChild(tempGP);
-    }
-
-    for (var i = 0; i < numLowCones; i++) {
-        let tempGP = document.createElement("div");
-        tempGP.className = "breakdown-grid-cone";
-        if (i + 1 >= numLowCones) {
-            if (i + 1 > numLowCones) {
-                tempGP.style.scale = `${(numLowCones * 100.0 % 100) / 100.0} 1`;
-            }
-        }
-        tempGridLowContainer.appendChild(tempGP);
-    }
-
-    let tempLowText = document.createElement("h8");
-    tempLowText.innerHTML = `<span style="color: rgb(133, 85, 255)">${Math.round(numLowCubes * 100) / 100}</span>, <span style="color: rgb(255, 217, 0)">${Math.round(numLowCones * 100) / 100}</span>`;
-    tempGridLowContainer.appendChild(tempLowText);
-
-    let tempGridAutoContainer = document.createElement("div");
-    tempGridAutoContainer.id = "breakdown-grid-auto-container";
-    tempGridAutoContainer.appendChild(tempGridContainer);
-
+    // Auto container
     let tempAutoContainer = document.createElement("div");
     tempAutoContainer.id = "breakdown-auto-container";
-    tempGridAutoContainer.appendChild(tempAutoContainer);
 
+    // Canvas for auto pie chart
     let autoPie = document.createElement("canvas");
     autoPie.id = "auto-pie-chart";
     tempAutoContainer.appendChild(autoPie);
@@ -1369,72 +1259,36 @@ function openTeamBreakdowns() {
     tempCommentContainer.id = "breakdown-comment-container";
     tempCommentContainer.innerHTML = "<span style='text-decoration: underline'>Comments & Videos:</span>";
 
+    // Fetches matches for team, adds to comment section
     getTeamMatchesTBA(`https://www.thebluealliance.com/api/v3/team/frc${document.getElementById("team-breakdown-select").value}/event/${document.getElementById("event-select").value}/matches`);
-
-    let tempStationsText = document.createElement("h1");
-    tempStationsText.className = "breakdown-comment";
-    // Floor, Single, Double
-    let usedStations = [0, 0, 0];
-
-    // Adds up the number of times team used floor, single, & double loading stations
-    for (var i = 0; i < RECORDS.length; i++) {
-        if (RECORDS[i][TEAM_INDEX] == parseInt(document.getElementById("team-breakdown-select").value)) {
-            if (RECORDS[i][30] == "Floor") {
-                usedStations[0]++;
-            } else if (RECORDS[i][30] == "Single") {
-                usedStations[1]++;
-            } else if (RECORDS[i][30] == "Double") {
-                usedStations[2]++;
-            }
-        }
-    }
-    tempStationsText.innerText = `Used floor pickup: ${usedStations[0]}\nUsed single loading station: ${usedStations[1]}\nUsed double loading station: ${usedStations[2]}`
-    tempCommentContainer.appendChild(tempStationsText);
 
     //let commentText = "Comments: ";
     for (var i = 0; i < RECORDS.length; i++) {
         if (RECORDS[i][TEAM_INDEX] == parseInt(document.getElementById("team-breakdown-select").value)) {
-            //console.log('y');
             let tempComment = document.createElement("h1");
             tempComment.className = "breakdown-comment";
-            tempComment.innerText = RECORDS[i][31];
+            // FIXME COMMENT INDEX WILL NEED TO BE CHANGED
+            tempComment.innerText = RECORDS[i][9];
             tempCommentContainer.appendChild(tempComment);
-            //commentText = commentText + "\n" + "\n" + RECORDS[i][27];
         }
     }
-    //tempCommentContainer.innerText = commentText;
 
-    tempGridContainer.appendChild(tempGridHighContainer);
-    tempGridContainer.appendChild(tempGridMidContainer);
-    tempGridContainer.appendChild(tempGridLowContainer);
-    tempFeedbackContainer.appendChild(tempGridAutoContainer);
+    tempFeedbackContainer.appendChild(tempAutoContainer);
     tempFeedbackContainer.appendChild(tempCommentContainer);
 
+    // Array of all team auto types
     let team_auto_types = [];
+    // Array of number of auto successes, corresponds with team_auto_types
     let team_auto_success = [];
 
-    // Tele loop
-    for (var g = 0; g < RECORDS.length; g++) {
+    // TODO this will have to be changed for 2024
+    for (let g = 0; g < RECORDS.length; g++) {
         if (RECORDS[g][TEAM_INDEX] == document.getElementById("team-breakdown-select").value) {
             let tempAuto = "A";
-            // CHANGE
-            let autoGP = parseInt(RECORDS[g][7]) + parseInt(RECORDS[g][8]) + parseInt(RECORDS[g][9] + parseInt(RECORDS[g][16]));
-            if (autoGP > 0) {
-                tempAuto += autoGP;
-                tempAuto += "p";
-            }
-            if (RECORDS[g][11] == "Yes") {
-                tempAuto += "C";
-            }
-            if (RECORDS[g][10] == "Yes" || autoGP > 1) {
-                tempAuto += "M";
-            }
-            team_auto_types.push(tempAuto);
-            if (RECORDS[g][15] == "Yes") {
-                team_auto_success.push(1);
-            } else {
-                team_auto_success.push(0);
-            }
+            // TODO CHANGE
+            
+            // FIXME ADD LETERS IN HERE TO SET AUTO BASED ON POINTS & STUFF
+
             console.warn(tempAuto);
         }
     }
@@ -1442,13 +1296,12 @@ function openTeamBreakdowns() {
     runAutoPie(team_auto_types, team_auto_success);
 }
 
-function getSortedIndex(colNum, team, records, columns) {
+// TODO REMOVE team parameter
+function getSortedIndex(colNum, records, columns) {
     var sortedColumn = JSON.parse(JSON.stringify(columns));
-    //console.log(sortedColumn[colNum]);
     sortedColumn = sortedColumn[colNum].sort(function (a, b) { return a - b });
-    //console.log(sortedColumn);
 
-    var sortedRows = [];
+    let sortedRows = [];
     var previousRows = [];
     var takenRows = [];
     var counter = 0;
