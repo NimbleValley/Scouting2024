@@ -753,67 +753,6 @@ option {
     scale: 1.1;
 }
 
-#grid-frc {
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.795);
-    position: fixed;
-    top: 0vh;
-    z-index: 10000;
-    left: 0;
-    margin-top: 0vh;
-    display: none;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-    flex-direction: column;
-}
-
-#close-grid-button {
-    background-color: #989898;
-    width: 18vh;
-    height: 8vh;
-    margin-bottom: 5vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.5vw;
-}
-
-#close-grid-button:hover {
-    cursor: pointer;
-}
-
-#close-grid-button>h2 {
-    transition: font-weight 0.15s;
-}
-
-#close-grid-button:hover>h2 {
-    font-weight: bolder !important;
-}
-
-#close-grid-button::after {
-    border-radius: 10vw;
-    content: "";
-    background-color: rgba(0, 0, 0, 0);
-    width: 0vw;
-    height: 0vw;
-    left: 0;
-    top: 0;
-    transition: width 0.15s, height 0.15s, background-color 0.15s, border-radius 0.15s;
-}
-
-#close-grid-button:hover::after {
-    border-radius: 0.5vw;
-    content: "";
-    background-color: rgb(230, 138, 33);
-    width: 18vh;
-    height: 8vh;
-    left: 0;
-    top: 0;
-    border-radius: 0.5vw;
-}
-
 h2 {
     width: fit-content;
     text-align: center;
@@ -821,15 +760,6 @@ h2 {
     font-size: 4vh;
     margin: 0;
     position: absolute;
-}
-
-#grid-inner {
-    background-color: #2b2b2b;
-    width: 90vw;
-    height: 30vh;
-    display: flex;
-    justify-content: space-around;
-    scale: 1 -1;
 }
 
 .node-container {
@@ -1123,41 +1053,6 @@ h9 {
     gap: 1vh;
 }
 
-#breakdown-grid-container {
-    display: flex;
-    flex-direction: column;
-    width: 64vh;
-    height: 33vh;
-    border-radius: 0.5vh;
-    background-color: #161311;
-    justify-content: space-evenly;
-    align-items: center;
-}
-
-.breakdown-grid-row-container {
-    height: 8vh;
-    width: 95%;
-    display: flex;
-    align-items: center;
-    gap: 1vh;
-}
-
-.breakdown-grid-cube {
-    width: 6vh;
-    height: 6vh;
-    background-color: rgb(63, 53, 196);
-    border-radius: 1vh;
-}
-
-.breakdown-grid-cone {
-    width: 0;
-    height: 0;
-    border-left: 2vh solid transparent;
-    border-right: 2vh solid transparent;
-    border-bottom: 6vh solid rgb(255, 217, 0);
-    border-radius: 1vh;
-}
-
 #breakdown-auto-container {
     display: flex;
     width: 64vh;
@@ -1166,12 +1061,6 @@ h9 {
     background-color: #161311;
     justify-content: space-evenly;
     align-items: center;
-}
-
-#breakdown-grid-auto-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
 }
 
 #breakdown-comment-container {
