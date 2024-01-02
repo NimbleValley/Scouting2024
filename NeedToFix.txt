@@ -11,6 +11,10 @@ Generally remove every reference to a grid
 
 ---- NEW FEATURES ----
 
+ADD CONSISTANCY FOR EVERY STAT, SHOW TRENDS
+
+ADD SPIDER GRAPHS
+
 Add features to pick list tab, such as data comparisons & auto sort
 
 Make autos more stimulating, maybe a drag and drop to visualize paths???
