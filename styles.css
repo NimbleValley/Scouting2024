@@ -1184,21 +1184,21 @@ a:hover {
 
 @keyframes column-sort-up {
     0% {
-        background-position: 0% 0%;
+        background-position: 0% 0vh;
     }
 
     100% {
-        background-position: 0% 100%;
+        background-position: 0% 35vh;
     }
 }
 
 @keyframes column-sort-down {
     0% {
-        background-position: 0% 100%;
+        background-position: 0% 0vh;
     }
 
     100% {
-        background-position: 0% 0%;
+        background-position: 0% -35vh;
     }
 }
 

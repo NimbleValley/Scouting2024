@@ -1287,7 +1287,7 @@ async function openTeamBreakdowns() {
         if (RECORDS[g][TEAM_INDEX] == document.getElementById("team-breakdown-select").value) {
             let tempAuto = "A";
             // TODO CHANGE
-            
+
             // FIXME ADD LETERS IN HERE TO SET AUTO BASED ON POINTS & STUFF
             team_auto_success.push(1);
             team_auto_types.push(tempAuto);
@@ -1357,7 +1357,7 @@ function sortColumn(colNum, type, records, columns, field, team, useCols) {
             cols[colNum].style.background = 'linear-gradient(0deg, rgba(18,18,18,1) 0%, rgba(255,158,0,1) 100%)';
             cols[colNum].style.animation = `column-sort-down ${2.5}s linear infinite`;
         }
-        cols[colNum].style.backgroundSize = "100vh 50%";
+        cols[colNum].style.backgroundSize = "100vh 35vh";
     }
 
     if (type == 1) {
@@ -2025,7 +2025,7 @@ function getTeamData() {
                     setTeamRowHighlight(parseInt(this.classList[1]), false);
                 });
             }
-            
+
             // If pick list contains team & team has color, set the border to correct color
             if (PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i])) != -1) {
                 if (PICK_LIST_OBJECTS[PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i]))].getColor() != 0) {
@@ -2062,7 +2062,9 @@ function getTeamData() {
     }
 
     // Sets highlight to what it was before
-    setRowHighlight(parseInt(localStorage.getItem("previousHighlightRow")), true);
+    if (localStorage.getItem("previousHighlightRow") != -1) {
+        setRowHighlight(parseInt(localStorage.getItem("previousHighlightRow")), true);
+    }
 }
 
 // Helper function, updates list of teams
