@@ -2026,6 +2026,11 @@ function getTeamData() {
                 });
             }
 
+            // Adds row stripes
+            if ((i) % 3 == 0) {
+                tempData.style.backgroundColor = "#302f2b";
+            }
+
             // If pick list contains team & team has color, set the border to correct color
             if (PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i])) != -1) {
                 if (PICK_LIST_OBJECTS[PICK_LIST_TEAM_KEY.indexOf(String(TEAMS[i]))].getColor() != 0) {
