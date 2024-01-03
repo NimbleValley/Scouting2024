@@ -731,6 +731,8 @@ function doMatch() {
 }
 
 function setUpGraph() {
+    graphContainer.innerHTML = "";
+
     breakdownLines.style.display = "none";
     pickListContainer.style.display = "none";
     breakdownGrid.style.display = "none";
@@ -739,16 +741,20 @@ function setUpGraph() {
         getTeamData();
     }
 
+    let tempSelectContainer = document.createElement("div");
+    tempSelectContainer.style.width = "100vh";
+    tempSelectContainer.style.display = "flex";
+
     //graphContainer.innerHTML = "";
     graphContainer.style.display = "flex";
     rawTable.innerHTML = "";
 
-    var tempTwo = document.createElement("select");
+    let tempTwo = document.createElement("select");
     tempTwo.id = "graph-category-select-two";
     tempTwo.addEventListener("input", doGraph);
     tempTwo.style.width = "30vh";
     tempTwo.style.marginRight = "5vh";
-    for (var i = 1; i < TEAM_FIELDS.length; i++) {
+    for (let i = 1; i < TEAM_FIELDS.length; i++) {
         let op = document.createElement("option");
         op.text = TEAM_FIELDS[i];
         op.value = i;
@@ -757,14 +763,14 @@ function setUpGraph() {
     if (localStorage.getItem("graph-two") != null) {
         tempTwo.value = localStorage.getItem("graph-two");
     }
-    rawTable.appendChild(tempTwo);
+    tempSelectContainer.appendChild(tempTwo);
 
-    var tempTeamSelect = document.createElement("select");
+    let tempTeamSelect = document.createElement("select");
     tempTeamSelect.id = "graph-category-select-team";
     tempTeamSelect.addEventListener("input", doGraph);
     tempTeamSelect.style.width = "15vh";
     tempTeamSelect.style.marginRight = "5vh";
-    for (var i = 0; i < TEAMS.length; i++) {
+    for (let i = 0; i < TEAMS.length; i++) {
         let op = document.createElement("option");
         op.text = TEAMS[i];
         op.value = TEAMS[i];
@@ -773,12 +779,12 @@ function setUpGraph() {
     if (localStorage.getItem("graph-team") != null) {
         tempTeamSelect.value = localStorage.getItem("graph-team");
     }
-    rawTable.appendChild(tempTeamSelect);
+    tempSelectContainer.appendChild(tempTeamSelect);
 
-    var temp = document.createElement("select");
+    let temp = document.createElement("select");
     temp.id = "graph-number-select";
     temp.style.width = "25vh";
-    for (var i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
         let op = document.createElement("option");
         if (i == 0) {
             op.text = i + 1 + " Value";
@@ -796,7 +802,7 @@ function setUpGraph() {
     }
 
     temp.addEventListener("input", doGraph);
-    rawTable.appendChild(temp);
+    tempSelectContainer.appendChild(temp);
 
     var tempT = document.createElement("select");
     tempT.id = "graph-category-select";
@@ -809,16 +815,31 @@ function setUpGraph() {
         op.value = i;
         tempT.append(op);
     }
-    rawTable.appendChild(tempT);
+    tempSelectContainer.appendChild(tempT);
 
     if (localStorage.getItem("graph-one") != null) {
         tempT.value = localStorage.getItem("graph-one");
     }
 
+    graphContainer.appendChild(tempSelectContainer);
+
+    let tempGraphCanvasContainer = document.createElement("div");
+    tempGraphCanvasContainer.id = "graph-canvas-container";
+
+    let tempGraphCanvas = document.createElement("canvas");
+    tempGraphCanvas.id = "graph-canvas";
+    tempGraphCanvasContainer.appendChild(tempGraphCanvas)
+
+    graphContainer.appendChild(tempGraphCanvasContainer);
+
+    rawTable.appendChild(graphContainer);
+
     doGraph();
 }
 
 function doGraph() {
+    var graphCanvas = document.getElementById("graph-canvas");
+
     var graphMode = parseInt(document.getElementById("graph-number-select").value);
 
     document.getElementById("graph-category-select-team").style.display = "none";
@@ -828,235 +849,67 @@ function doGraph() {
         document.getElementById("graph-category-select-two").style.display = "block";
     }
 
-    graphContainer.innerHTML = "";
-
+    // Column to look at
     var graphColumn = document.getElementById("graph-category-select").value;
-    var sortedGraphColumn = JSON.parse(JSON.stringify(TEAM_COLUMNS));
-    sortedGraphColumn = sortedGraphColumn[graphColumn].sort(function (a, b) { return a - b });
 
-    var lower_bound = sortedGraphColumn[0];
-    var upper_bound = sortedGraphColumn[sortedGraphColumn.length - 1];
+    // Sorted column
+    var sortedGraphColumn = JSON.parse(JSON.stringify(TEAM_COLUMNS));
+
+    if (graphMode == 1) {
+        sortedGraphColumn = sortedGraphColumn[graphColumn].sort(function (a, b) { return a - b });
+
+        // Sorted teams
+        var teamsSorted = [];
+        var newTeams = JSON.parse(JSON.stringify(TEAMS));
+        for (let i = 0; i < sortedGraphColumn.length; i++) {
+            for (let t = 0; t < newTeams.length; t++) {
+                if (TEAM_ROWS[t][graphColumn] == sortedGraphColumn[i] && !teamsSorted.includes(newTeams[t])) {
+                    teamsSorted.push(newTeams[t]);
+                    newTeams.splice(t, 1);
+                    i--;
+                    break;
+                }
+            }
+        }
+    }
 
     if (graphMode == 2) {
         var secondGraphColumn = document.getElementById("graph-category-select-two").value;
-        var secondSortedGraphColumn = JSON.parse(JSON.stringify(TEAM_COLUMNS));
-        secondSortedGraphColumn = secondSortedGraphColumn[secondGraphColumn].sort(function (a, b) { return b - a });
+        let secondSortedGraphColumn = JSON.parse(JSON.stringify(TEAM_COLUMNS));
+        secondSortedGraphColumn = secondSortedGraphColumn[secondGraphColumn];
 
-        var second_lower_bound = secondSortedGraphColumn[0];
-        var second_upper_bound = secondSortedGraphColumn[secondSortedGraphColumn.length - 1];
+        sortedGraphColumn = sortedGraphColumn[graphColumn]
+
+        var teamData2d = [];
+        for (let i = 0; i < secondSortedGraphColumn.length; i++) {
+            teamData2d.push({
+                team: TEAMS[i],
+                x: sortedGraphColumn[i],
+                y: secondSortedGraphColumn[i]
+            });
+        }
     }
 
-    var leftContainer = document.createElement("div");
-    leftContainer.id = "graph-left-legend";
-
-    var bottomContainer = document.createElement("div");
-    bottomContainer.id = "graph-bottom-legend";
-
-    var tickContainer = document.createElement("div");
-    tickContainer.id = "graph-tick-container";
-
-    var tempAverageVertical = document.createElement("div");
-    tempAverageVertical.id = "graph-average-vertical";
-
-    var tempAverageHorizontal = document.createElement("div");
-    tempAverageHorizontal.id = "graph-average-horizontal";
-
-    /*window.addEventListener("resize", function() {
-        doGraph();
-    });*/
-
-    // Only used for consistency
-    // All values from matches
-    var team_record_values = [];
-    // All matches involving said team
-    var team_record_matches = [];
-
     // Creates a graph dot for every team, only used when comparing teams
-    if (graphMode != 3) {
-        for (var i = 0; i < TEAMS.length; i++) {
-            /*var tempGraphLine = document.createElement("div");
-            tempGraphLine.className = "graph-line";
-            tempGraphLine.innerHTML = `
-                                            <div class="graph-track">
-                                                <div class="graph-inner-line"></div>
-                                            </div>
-                                        `;*/
-            if (graphMode == 1) {
-                let tempLeft = document.createElement("h6");
-                tempLeft.innerText = `${TEAMS[i]}`;
-                leftContainer.appendChild(tempLeft);
-            }
-
-            var tempDot = document.createElement("div");
-            tempDot.className = "graph-dot";
-            tempDot.id = TEAMS[i];
-            tempDot.style.left = 0;
-            tempDot.style.top = 0;
-            tempDot.style.scale = 0.5;
-            tempDot.innerHTML = `<p>${TEAMS[i]}</p>`
-
-            var tempDotPopup = document.createElement("div");
-            tempDotPopup.className = "dot-popup";
-            if (graphMode == 1) {
-                tempDotPopup.innerText = TEAMS[i] + "\n" + TEAM_COLUMNS[graphColumn][i];
-            } else {
-                tempDotPopup.innerText = TEAMS[i] + "\n" + TEAM_COLUMNS[graphColumn][i] + ", " + TEAM_COLUMNS[secondGraphColumn][i];
-            }
-            tempDot.appendChild(tempDotPopup);
-
-            var tempTick = document.createElement("div");
-            tempTick.className = "graph-tick-container";
-            tempTick.innerHTML = `<div class = "graph-tick"> </div>`;
-
-            tempDot.style.left = `0vh`;
-            tempDot.style.top = `${0}vh`;
-            tempDot.id = i;
-
-            tickContainer.appendChild(tempDot);
-            //graphContainer.appendChild(tempGraphLine);
-        }
-
-        if (graphMode == 2) {
-            for (var i = 0; i < 5; i++) {
-                var tempLeft = document.createElement("h6");
-                tempLeft.innerText = `${((second_upper_bound - second_lower_bound) * (i / 4)) + second_lower_bound}`;
-                leftContainer.appendChild(tempLeft);
-            }
-
-        }
-
-        for (var i = 0; i < 5; i++) {
-            var tempBottom = document.createElement("h6");
-            tempBottom.innerText = `${((upper_bound - lower_bound) * (i / 4)) + lower_bound}`;
-            bottomContainer.appendChild(tempBottom);
-        }
-
-        tickContainer.appendChild(tempAverageVertical);
-        if (graphMode == 2) {
-            tickContainer.appendChild(tempAverageHorizontal);
-        } else {
-            tempAverageHorizontal.style.display = "none";
-        }
-
-        graphContainer.appendChild(leftContainer);
-        graphContainer.appendChild(tickContainer);
-        graphContainer.appendChild(bottomContainer);
-
-        // Left, Tick, Bottom, sounds like trouble :(
-
-        var dots = document.getElementsByClassName("graph-dot");
-        var graphTickContainer = document.getElementById("graph-tick-container");
-        console.log(graphTickContainer.offsetHeight);
-        for (var i = 0; i < dots.length; i++) {
-            console.log(upper_bound + ", " + lower_bound + ", " + TEAM_COLUMNS[graphColumn][i]);
-            var percentage = (TEAM_COLUMNS[graphColumn][i] - lower_bound) / (upper_bound - lower_bound);
-            console.log(percentage);
-            if (graphMode == 1) {
-                dots[i].style.top = `${(graphTickContainer.offsetHeight * ((parseInt(dots[i].id) + 0) / (dots.length - 1))) + (((i + 1) % 2) * 0) - (window.innerHeight * (1 / 100))}px`;
-            } else {
-                var secondPercentage = (TEAM_COLUMNS[secondGraphColumn][i] - second_lower_bound) / (second_upper_bound - second_lower_bound);
-                dots[i].style.top = `${(graphTickContainer.offsetHeight * secondPercentage) + (((i + 1) % 3) * 0) - (window.innerHeight * (1 / 100))}px`;
-            }
-            // I'm so clever I thought of the solution on the walk home from school with mod
-            dots[i].style.left = `${(graphTickContainer.offsetWidth * percentage) - ((i % 4) * 0) - (window.innerHeight * (1 / 100))}px`;
-            dots[i].style.scale = 1;
-        }
-
-        var avgVertical = 0;
-        for (var i = 0; i < sortedGraphColumn.length; i++) {
-            avgVertical += sortedGraphColumn[i];
-        }
-
-        avgVertical /= sortedGraphColumn.length;
-        tempAverageVertical.style.left = `${(graphTickContainer.offsetWidth * ((avgVertical - lower_bound) / (upper_bound - lower_bound))) - (window.innerHeight * (1 / 100))}px`;
-
-        if (graphMode == 2) {
-            var avgHorizontal = 0;
-            for (var i = 0; i < secondSortedGraphColumn.length; i++) {
-                avgHorizontal += secondSortedGraphColumn[i];
-            }
-            avgHorizontal /= secondSortedGraphColumn.length;
-
-            tempAverageHorizontal.style.top = `${(graphTickContainer.offsetHeight * ((avgHorizontal - second_lower_bound) / (second_upper_bound - second_lower_bound))) - (window.innerHeight * (1 / 100))}px`;
-        }
-
-
-        // END COMPARE SECTION ;)
-
-    } else {
-        //Consistency stuff
-        document.getElementById("graph-category-select-team").style.display = "block";
-        for (var i = 0; i < RECORDS.length; i++) {
-            if (RECORDS[i][TEAM_INDEX] == document.getElementById("graph-category-select-team").value) {
-                team_record_matches.push(RECORDS[i][2]);
-                team_record_values.push(RECORDS[i][FIELDS.indexOf(TEAM_FIELDS[graphColumn])]);
-            }
-        }
-        console.log(team_record_values);
-
-        let sortedTempRecords = JSON.parse(JSON.stringify(team_record_values)).sort(function (a, b) { return a - b });;
-
-        // More dots
-        for (var i = 0; i < team_record_values.length; i++) {
-            /*var tempGraphLine = document.createElement("div");
-            tempGraphLine.className = "graph-line";
-            tempGraphLine.innerHTML = `
-                                            <div class="graph-track">
-                                                <div class="graph-inner-line"></div>
-                                            </div>
-                                        `;*/
-
-            let tempDot = document.createElement("div");
-            tempDot.className = "graph-dot";
-            tempDot.id = team_record_values[i];
-
-            let tempDotPopup = document.createElement("div");
-            tempDotPopup.className = "dot-popup";
-            tempDotPopup.innerText = team_record_values[i];
-            tempDot.appendChild(tempDotPopup);
-
-            let tempTick = document.createElement("div");
-            tempTick.className = "graph-tick-container";
-            tempTick.innerHTML = `<div class = "graph-tick"> </div>`;
-
-            tempDot.style.left = `0vh`;
-            tempDot.style.top = `${0}vh`;
-            tempDot.id = i;
-            tempDot.style.scale = 1;
-
-            graphContainer.appendChild(leftContainer);
-            graphContainer.appendChild(tickContainer);
-            graphContainer.appendChild(bottomContainer);
-
-            tempDot.style.top = `${(document.getElementById("graph-tick-container").offsetHeight * ((i) / (team_record_values.length - 1))) - (window.innerHeight * (1 / 100))}px`;
-            tempDot.style.left = document.getElementById("graph-tick-container").offsetWidth * ((team_record_values[i] - sortedTempRecords[0]) / (sortedTempRecords[sortedTempRecords.length - 1] - sortedTempRecords[0])) + "px";
-
-            console.log((sortedTempRecords))
-
-            tickContainer.appendChild(tempDot);
-            //graphContainer.appendChild(tempGraphLine);
-
-            let tempLeft = document.createElement("h6");
-            tempLeft.innerText = `${team_record_matches[i]}`;
-            leftContainer.appendChild(tempLeft);
-        }
-
-        for (var i = 0; i < 5; i++) {
-            let tempBottom = document.createElement("h6");
-            tempBottom.innerText = ((i / 4) * (sortedTempRecords[sortedTempRecords.length - 1] - sortedTempRecords[0])) + sortedTempRecords[0];
-            bottomContainer.appendChild(tempBottom);
-        }
-
-        tempAverageVertical.style.left = `${(document.getElementById("graph-tick-container").offsetWidth * ((TEAM_ROWS[TEAMS.indexOf(parseInt(document.getElementById("graph-category-select-team").value))][graphColumn] - sortedTempRecords[0]) / (sortedTempRecords[sortedTempRecords.length - 1] - sortedTempRecords[0]))) - (window.innerHeight * (1 / 100))}px`;
-        document.getElementById("graph-tick-container").appendChild(tempAverageVertical);
-
-        localStorage.setItem("graph-team", document.getElementById("graph-category-select-team").value);
-
+    switch (graphMode) {
+        case 1:
+            showBarGraph(graphCanvas, sortedGraphColumn, teamsSorted, TEAM_FIELDS[graphColumn]);
+            break;
+        case 2:
+            showScatterChart(graphCanvas, teamData2d, [TEAM_FIELDS[graphColumn], TEAM_FIELDS[secondGraphColumn]]);
+            break;
+        case 3:
+            document.getElementById("graph-category-select-team").style.display = "block";
+            break;
+        default:
+            console.error("Invalid graph mode :(");
+            break;
     }
 
     localStorage.setItem("graph-mode", document.getElementById("graph-number-select").value);
     localStorage.setItem("graph-one", document.getElementById("graph-category-select").value);
     localStorage.setItem("graph-two", document.getElementById("graph-category-select-two").value);
+    localStorage.setItem("graph-team", document.getElementById("graph-category-select-team").value);
 }
 
 // Sets up breakdown tab, only runs on first click
@@ -1297,7 +1150,7 @@ async function openTeamBreakdowns() {
     runAutoPie(team_auto_types, team_auto_success);
 }
 
-// TODO REMOVE team parameter
+// Sorts teams based on column
 function getSortedIndex(colNum, records, columns) {
     var sortedColumn = JSON.parse(JSON.stringify(columns));
     sortedColumn = sortedColumn[colNum].sort(function (a, b) { return a - b });
@@ -1328,6 +1181,7 @@ function getSortedIndex(colNum, records, columns) {
     return sortedRows;
 }
 
+// TODO Document & clean up this function
 function sortColumn(colNum, type, records, columns, field, team, useCols) {
     var direction = parseInt(localStorage.getItem("direction"));
     var previousColumn = parseInt(localStorage.getItem("column"));
@@ -1460,11 +1314,10 @@ function sortColumn(colNum, type, records, columns, field, team, useCols) {
                     }
                 }
             }*/
-            for (var i = 0; i < sortedRows.length; i++) {
-                for (var t = 0; t < TEAMS.length; t++) {
-                    console.log(sortedRows[i][0])
+            for (let i = 0; i < sortedRows.length; i++) {
+                for (let t = 0; t < TEAMS.length; t++) {
                     if (sortedRows[i][0] == TEAMS[t]) {
-                        for (var c = 0; c < cols.length; c++) {
+                        for (let c = 0; c < cols.length; c++) {
                             cols[c].children[i + 1].classList = "data-value";
                             cols[c].children[i + 1].classList.add(t);
                         }
@@ -1478,7 +1331,8 @@ function sortColumn(colNum, type, records, columns, field, team, useCols) {
         }
 
     } else {
-        console.log("Sad");
+        // Uh oh it's not a number :(
+        console.error("Sad");
     }
 }
 

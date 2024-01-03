@@ -1301,17 +1301,20 @@ h6 {
     margin-top: 1vh;
 }
 
-#graph-container {
-    position: relative;
-    border-radius: 0.5vh;
-    margin-left: calc(2.5vw + 30vh);
-    top: 0;
-    width: calc(95vw - 30vh);
-    background-color: #272727;
-    flex-direction: row;
-    height: fit-content;
-    flex-direction: row;
+#graph-canvas {
     margin-top: 5vh;
+}
+
+#graph-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+}
+
+#graph-canvas-container {
+    height: 75vh;
+    width: calc(100vw - 35vh);
 }
 
 #graph-left-legend {

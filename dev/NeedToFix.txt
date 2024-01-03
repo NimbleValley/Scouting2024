@@ -1,19 +1,19 @@
 ---- ISSUES ----
 
+Sometimes dorting takes multiple clicks in team tab, check localStorage?
+
 Breakdowns take too long to run, why is the setup called multiple times? 
 Also team data doesn't need to populate rows for breakdown, useless waste of time 
-
-Team highlight automatically highlights headers in team data tab
-
-Generally remove every reference to a grid
 
 
 
 ---- NEW FEATURES ----
 
+ADD SPIDER GRAPHS
+
 ADD CONSISTANCY FOR EVERY STAT, SHOW TRENDS
 
-ADD SPIDER GRAPHS
+Add team similarity insights
 
 Add features to pick list tab, such as data comparisons & auto sort
 
