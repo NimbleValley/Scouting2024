@@ -784,14 +784,16 @@ function setUpGraph() {
     let temp = document.createElement("select");
     temp.id = "graph-number-select";
     temp.style.width = "25vh";
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
         let op = document.createElement("option");
         if (i == 0) {
             op.text = i + 1 + " Value";
         } else if (i == 1) {
             op.text = i + 1 + " Values";
-        } else {
-            op.text = "Consistency"
+        } else if (i == 2) {
+            op.text = "Consistency Matrix"
+        } else if (i == 3) {
+            op.text = "Consistency Line"
         }
         op.value = i + 1;
         temp.append(op);
@@ -845,61 +847,116 @@ function doGraph() {
     document.getElementById("graph-category-select-team").style.display = "none";
     document.getElementById("graph-category-select-two").style.display = "none";
 
-    if (graphMode == 2) {
-        document.getElementById("graph-category-select-two").style.display = "block";
-    }
-
     // Column to look at
     var graphColumn = document.getElementById("graph-category-select").value;
 
     // Sorted column
     var sortedGraphColumn = JSON.parse(JSON.stringify(TEAM_COLUMNS));
 
-    if (graphMode == 1) {
-        sortedGraphColumn = sortedGraphColumn[graphColumn].sort(function (a, b) { return a - b });
-
-        // Sorted teams
-        var teamsSorted = [];
-        var newTeams = JSON.parse(JSON.stringify(TEAMS));
-        for (let i = 0; i < sortedGraphColumn.length; i++) {
-            for (let t = 0; t < newTeams.length; t++) {
-                if (TEAM_ROWS[t][graphColumn] == sortedGraphColumn[i] && !teamsSorted.includes(newTeams[t])) {
-                    teamsSorted.push(newTeams[t]);
-                    newTeams.splice(t, 1);
-                    i--;
-                    break;
-                }
-            }
-        }
-    }
-
-    if (graphMode == 2) {
-        var secondGraphColumn = document.getElementById("graph-category-select-two").value;
-        let secondSortedGraphColumn = JSON.parse(JSON.stringify(TEAM_COLUMNS));
-        secondSortedGraphColumn = secondSortedGraphColumn[secondGraphColumn];
-
-        sortedGraphColumn = sortedGraphColumn[graphColumn]
-
-        var teamData2d = [];
-        for (let i = 0; i < secondSortedGraphColumn.length; i++) {
-            teamData2d.push({
-                team: TEAMS[i],
-                x: sortedGraphColumn[i],
-                y: secondSortedGraphColumn[i]
-            });
-        }
-    }
-
     // Creates a graph dot for every team, only used when comparing teams
     switch (graphMode) {
         case 1:
+            document.getElementById("graph-category-select").style.display = "block";
+            sortedGraphColumn = sortedGraphColumn[graphColumn].sort(function (a, b) { return a - b });
+
+            // Sorted teams
+            var teamsSorted = [];
+            var newTeams = JSON.parse(JSON.stringify(TEAMS));
+            for (let i = 0; i < sortedGraphColumn.length; i++) {
+                for (let t = 0; t < newTeams.length; t++) {
+                    if (TEAM_ROWS[t][graphColumn] == sortedGraphColumn[i] && !teamsSorted.includes(newTeams[t])) {
+                        teamsSorted.push(newTeams[t]);
+                        newTeams.splice(t, 1);
+                        i--;
+                        break;
+                    }
+                }
+            }
             showBarGraph(graphCanvas, sortedGraphColumn, teamsSorted, TEAM_FIELDS[graphColumn]);
             break;
         case 2:
+            document.getElementById("graph-category-select-two").style.display = "block";
+            document.getElementById("graph-category-select").style.display = "block";
+            var secondGraphColumn = document.getElementById("graph-category-select-two").value;
+            let secondSortedGraphColumn = JSON.parse(JSON.stringify(TEAM_COLUMNS));
+            secondSortedGraphColumn = secondSortedGraphColumn[secondGraphColumn];
+
+            sortedGraphColumn = sortedGraphColumn[graphColumn]
+
+            var teamData2d = [];
+            for (let i = 0; i < secondSortedGraphColumn.length; i++) {
+                teamData2d.push({
+                    team: TEAMS[i],
+                    x: sortedGraphColumn[i],
+                    y: secondSortedGraphColumn[i]
+                });
+            }
             showScatterChart(graphCanvas, teamData2d, [TEAM_FIELDS[graphColumn], TEAM_FIELDS[secondGraphColumn]]);
             break;
         case 3:
+            document.getElementById("graph-category-select").style.display = "none";
             document.getElementById("graph-category-select-team").style.display = "block";
+            let tempData = [];
+            let teamRows = [];
+
+            let selectedTeam = document.getElementById("graph-category-select-team").value;
+            let matchesSorted = [];
+
+            for (let i = 0; i < RECORDS.length; i++) {
+                if (parseInt(RECORDS[i][0]) == parseInt(selectedTeam)) {
+                    teamRows.push(RECORDS[i]);
+                    // TODO: CHANGE TO MATCH NUMBER COLUMN IN 2024
+                    matchesSorted.push(RECORDS[i][2]);
+                }
+            }
+            matchesSorted = matchesSorted.sort(function (a, b) { return a - b });
+
+            let sortedTeamRows = [];
+
+            for (let i = 0; i < matchesSorted.length; i++) {
+                for (let c = 0; c < teamRows.length; c++) {
+                    // TODO: CHANGE TO MATCH NUMBER COLUMN IN 2024
+                    if (teamRows[c][2] == matchesSorted[i]) {
+                        sortedTeamRows.push(teamRows[c]);
+                        teamRows.splice(c, 1);
+                        c--;
+                        break;
+                    }
+                }
+            }
+
+            let formattedData = [];
+            let includedFields = [];
+
+            for (let i = 0; i < sortedTeamRows.length; i++) {
+                for (let c = 0; c < sortedTeamRows[0].length; c++) {
+                    if (detectCharacter(new String(sortedTeamRows[i][c]).substring(0, 1)) == 1) {
+                        formattedData.push({
+                            x: matchesSorted[i],
+                            y: FIELDS[c],
+                            d: FIELDS[c],
+                            v: sortedTeamRows[i][c],
+                            index: 1
+                        });
+                        if(!includedFields.includes(FIELDS[c])) {
+                            includedFields.push(FIELDS[c]);
+                        }
+                    }
+                }
+            }
+
+            console.log(matchesSorted);
+            console.log(sortedTeamRows);
+
+            // FIXME
+            // TODO Add in the color-coding, probably just sort each row & pass an array of indexes into function
+            showMatrixGraph(graphCanvas, formattedData, matchesSorted, includedFields, TEAM_FIELDS[graphColumn]);
+            break;
+        case 4:
+            document.getElementById("graph-category-select").style.display = "block";
+            document.getElementById("graph-category-select-team").style.display = "block";
+
+            showLineGraph(graphCanvas, tempData, TEAM_FIELDS[graphColumn]);
             break;
         default:
             console.error("Invalid graph mode :(");

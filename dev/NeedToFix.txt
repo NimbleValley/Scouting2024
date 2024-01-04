@@ -1,5 +1,7 @@
 ---- ISSUES ----
 
+FIXME 1 VALUE BAR GRAPHS HAVE TEAMS IN WRONG ORDER   D: ):  ):<
+
 Sometimes dorting takes multiple clicks in team tab, check localStorage?
 
 Breakdowns take too long to run, why is the setup called multiple times? 
