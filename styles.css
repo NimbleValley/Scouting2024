@@ -1322,6 +1322,7 @@ h6 {
 
 #graph-number-select {
     border: solid 0.75vh #d16117;
+    width: fit-content !important;
 }
 
 #graph-number-select:hover {

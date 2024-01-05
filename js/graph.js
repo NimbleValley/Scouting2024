@@ -141,6 +141,8 @@ function showMatrixGraph(canvas, teamData, matchNumbers, includedFields, descrip
 
     console.log("Rendering consistency matrix graph.");
 
+    console.log(includedFields)
+
     const scales = {
         x: {
           type: 'category',
@@ -164,7 +166,6 @@ function showMatrixGraph(canvas, teamData, matchNumbers, includedFields, descrip
           }
         }
     }
-
     const options = {
         plugins: {
             legend: false,
@@ -174,21 +175,23 @@ function showMatrixGraph(canvas, teamData, matchNumbers, includedFields, descrip
                         return '';
                     },
                     label(context) {
+                        // Bob
+                        //alert('bob');
+                        // Why won't bob alert me :(
+
+                        // Update: bob alerts now, I had two plugin keys smh 
                         const v = context.dataset.data[context.dataIndex];
-                        return ['d: ' + v.d, 'v: ' + v.v.toFixed(2)];
+                        return ['d: ' + v.v];
                     }
                 }
-            }
-        },
-        scales: scales,
-        plugins: {
-            // Change options for ALL labels of THIS CHART
+            },
             datalabels: {
                 color: '#ffffff',
                 align: 'top',
                 display: false
             }
-        }
+        },
+        scales: scales
     };
 
     const data = {
@@ -197,7 +200,7 @@ function showMatrixGraph(canvas, teamData, matchNumbers, includedFields, descrip
             label: "TEST",
             backgroundColor({ raw }) {
                 const alpha = (10 + raw.v) / 60;
-                return alpha;
+                return `rgba(0, 255, 0, ${raw.index})`;
             },
             borderColor({ raw }) {
                 const alpha = (10 + raw.v) / 60;

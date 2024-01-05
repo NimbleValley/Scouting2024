@@ -853,7 +853,6 @@ function doGraph() {
     // Sorted column
     var sortedGraphColumn = JSON.parse(JSON.stringify(TEAM_COLUMNS));
 
-    // Creates a graph dot for every team, only used when comparing teams
     switch (graphMode) {
         case 1:
             document.getElementById("graph-category-select").style.display = "block";
@@ -897,14 +896,21 @@ function doGraph() {
             document.getElementById("graph-category-select").style.display = "none";
             document.getElementById("graph-category-select-team").style.display = "block";
             let tempData = [];
-            let teamRows = [];
+            let tempTeamRows = [];
 
             let selectedTeam = document.getElementById("graph-category-select-team").value;
             let matchesSorted = [];
 
             for (let i = 0; i < RECORDS.length; i++) {
                 if (parseInt(RECORDS[i][0]) == parseInt(selectedTeam)) {
-                    teamRows.push(RECORDS[i]);
+                    // Filters to only numerical data
+                    let filteredRecord = [];
+                    for (let f = 0; f < RECORDS[i].length; f++) {
+                        if (detectCharacter(new String(RECORDS[i][f]).substring(0, 1)) == 1) {
+                            filteredRecord.push(RECORDS[i][f]);
+                        }
+                    }
+                    tempTeamRows.push(filteredRecord);
                     // TODO: CHANGE TO MATCH NUMBER COLUMN IN 2024
                     matchesSorted.push(RECORDS[i][2]);
                 }
@@ -914,43 +920,82 @@ function doGraph() {
             let sortedTeamRows = [];
 
             for (let i = 0; i < matchesSorted.length; i++) {
-                for (let c = 0; c < teamRows.length; c++) {
+                for (let c = 0; c < tempTeamRows.length; c++) {
                     // TODO: CHANGE TO MATCH NUMBER COLUMN IN 2024
-                    if (teamRows[c][2] == matchesSorted[i]) {
-                        sortedTeamRows.push(teamRows[c]);
-                        teamRows.splice(c, 1);
+                    if (tempTeamRows[c][1] == matchesSorted[i]) {
+                        sortedTeamRows.push(tempTeamRows[c]);
+                        tempTeamRows.splice(c, 1);
                         c--;
                         break;
                     }
                 }
             }
 
+            // FIXME fix this embarassing nonesense sad excuse of a function
+
+            // Now remove match numbers
+            // Spagetti code im tired :(
+            for (let i = 0; i < sortedTeamRows.length; i++) {
+                // FIXME guess what is it
+                // It's what all the other ones say
+                // TODO ChAnGe To MaTcH nUmBeR cOlUmN iN 2024 -_-
+                sortedTeamRows[i].splice(0, 2);
+            }
+
             let formattedData = [];
-            let includedFields = [];
+            let includedFields = JSON.parse(JSON.stringify(TEAM_FIELDS));
+
+            // Remove team number field, not needed
+            includedFields.splice(0, 1);
+
+            // NOW sort every data element & check indicies
+            let indicies = [];
+
+            // Now make some columns
+            let tempSortedColumns = [];
+            for (let c = 0; c < sortedTeamRows[0].length; c++) {
+                let tempArray = [];
+                for (let i = 0; i < sortedTeamRows.length; i++) {
+                    tempArray.push(sortedTeamRows[i][c]);
+                }
+                tempSortedColumns.push(tempArray);
+            }
+
+            for (let i = 0; i < tempSortedColumns.length; i++) {
+                let tempSortedRow = tempSortedColumns[i].toSorted((a, b) => a - b);
+                let tempIndicies = [];
+                for (let c = 0; c < tempSortedColumns[i].length; c++) {
+                    // Special case, don't divide by 0 & make it bright if it's the only one
+                    if (tempSortedRow.length != 0 && tempSortedRow.length != 1) {
+                        tempIndicies.push(tempSortedRow.indexOf(tempSortedColumns[i][c]) / (tempSortedRow.length-1));
+                    } else {
+                        tempIndicies.push(1);
+                    }
+                }
+                indicies.push(tempIndicies);
+            }
+
+            // NO WAY this disaster of a function actually works :0 now time to document & clean it up
+            // But first mason needs sleep
 
             for (let i = 0; i < sortedTeamRows.length; i++) {
                 for (let c = 0; c < sortedTeamRows[0].length; c++) {
-                    if (detectCharacter(new String(sortedTeamRows[i][c]).substring(0, 1)) == 1) {
-                        formattedData.push({
-                            x: matchesSorted[i],
-                            y: FIELDS[c],
-                            d: FIELDS[c],
-                            v: sortedTeamRows[i][c],
-                            index: 1
-                        });
-                        if(!includedFields.includes(FIELDS[c])) {
-                            includedFields.push(FIELDS[c]);
-                        }
-                    }
+                    formattedData.push({
+                        x: matchesSorted[i],
+                        y: includedFields[c],
+                        v: sortedTeamRows[i][c],
+                        index: indicies[c][i]
+                    });
                 }
             }
 
-            console.log(matchesSorted);
+            // FIXME remove so many nested for-loops but at least most of them are O(1)
+
             console.log(sortedTeamRows);
 
             // FIXME
             // TODO Add in the color-coding, probably just sort each row & pass an array of indexes into function
-            showMatrixGraph(graphCanvas, formattedData, matchesSorted, includedFields, TEAM_FIELDS[graphColumn]);
+            showMatrixGraph(graphCanvas, formattedData, matchesSorted, includedFields, "Description");
             break;
         case 4:
             document.getElementById("graph-category-select").style.display = "block";
