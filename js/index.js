@@ -100,7 +100,7 @@ const warningTypes = ["Flip/s", "Comm Issue/s", "Disabled", "Unintelligent", "Re
 var PICK_LIST = new Array();
 var PICK_LIST_TEAM_KEY = new Array();
 var PICK_LIST_OBJECTS = new Array();
-// TODO I forgot hwo this works double check
+// TODO I forgot how this works double check
 var PICK_LIST_ORDER = new Array();
 
 
@@ -167,8 +167,7 @@ new Sortable(innerPickListContainer, {
 localStorage.setItem("previousHighlightRow", -1);
 
 const pickListScaleSlider = document.getElementById("pick-list-scale");
-pickListScaleSlider.addEventListener("input", pickListSliderCallback
-);
+pickListScaleSlider.addEventListener("input", pickListSliderCallback);
 
 // TBA API constants, for finding events
 var TBA_EVENT_KEYS;
@@ -967,7 +966,7 @@ function doGraph() {
                 for (let c = 0; c < tempSortedColumns[i].length; c++) {
                     // Special case, don't divide by 0 & make it bright if it's the only one
                     if (tempSortedRow.length != 0 && tempSortedRow.length != 1) {
-                        tempIndicies.push(tempSortedRow.indexOf(tempSortedColumns[i][c]) / (tempSortedRow.length-1));
+                        tempIndicies.push(tempSortedRow.indexOf(tempSortedColumns[i][c]) / (tempSortedRow.length - 1));
                     } else {
                         tempIndicies.push(1);
                     }
@@ -1503,10 +1502,7 @@ function sortColumn(colNum, type, records, columns, field, team, useCols) {
 
 function detectCharacter(val) {
     //console.log(val);
-    if (val == "0" || val == "1" || val == "2" || val == "3" || val == "4" || val == "5" || val == "6" || val == "7" || val == "8" || val == "9") {
-        return 1;
-    }
-    return 0;
+    return (val == "0" || val == "1" || val == "2" || val == "3" || val == "4" || val == "5" || val == "6" || val == "7" || val == "8" || val == "9") ? 1 : 0;
 }
 
 function originalSort(record, column, field) {
