@@ -145,25 +145,25 @@ function showMatrixGraph(canvas, teamData, matchNumbers, includedFields, descrip
 
     const scales = {
         x: {
-          type: 'category',
-          labels: matchNumbers,
-          ticks: {
-            display: true
-          },
-          grid: {
-            display: false
-          }
+            type: 'category',
+            labels: matchNumbers,
+            ticks: {
+                display: true
+            },
+            grid: {
+                display: false
+            }
         },
         y: {
-          type: 'category',
-          labels: includedFields,
-          offset: true,
-          ticks: {
-            display: true
-          },
-          grid: {
-            display: false
-          }
+            type: 'category',
+            labels: includedFields,
+            offset: true,
+            ticks: {
+                display: true
+            },
+            grid: {
+                display: false
+            }
         }
     }
     const options = {
@@ -223,9 +223,33 @@ function showMatrixGraph(canvas, teamData, matchNumbers, includedFields, descrip
     graph = new Chart(canvas, config);
 }
 
-function showLineGraph() {
-    resizeGraph();
+function showConsistencyLineGraph(canvas, matches, values, teams) {
+    let graphContainer = document.getElementById("graph-canvas-container");
+
     terminateGraph();
+
+    console.log("Rendering horizontal bar graph.");
+
+    let matchData = [];
+
+    for (let i = 0; i < matches.length; i++) {
+        matchData.push({ x: matches[i], y: values[i] })
+    }
+
+    const data = {
+        labels: matches,
+        datasets: [{
+            data: values,
+            label: teams[0]
+        }]
+    };
+
+    const config = {
+        type: 'line',
+        data: data
+    };
+
+    graph = new Chart(canvas, config);
 }
 
 // Helper functions

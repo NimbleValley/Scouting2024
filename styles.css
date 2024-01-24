@@ -929,6 +929,8 @@ h8 {
 h9 {
     font-size: 1.725vh;
     color: #847676;
+    text-align: center;
+    margin-top: 2vh;
 }
 
 #breakdown-grid {
@@ -978,7 +980,7 @@ h9 {
     margin-right: 1vh;
     height: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     flex-direction: column;
     border-radius: 0.5vh;
@@ -1330,6 +1332,8 @@ h6 {
 
 #graph-number-select:hover {
     border: solid 0.75vh rgb(155, 155, 155);
+    background-color: #57524f !important;
+    color: white !important;
 }
 
 

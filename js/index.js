@@ -233,7 +233,7 @@ function getPickList() {
         for (var i = 0; i < tempIndex.length; i++) {
             PICK_LIST[i] = new Array(tempIndex[i], tempNum[i], tempColor[i]);
         }
-        console.log(PICK_LIST);
+        //console.log(PICK_LIST);
         PICK_LIST_OBJECTS = [];
         PICK_LIST_TEAM_KEY = [];
         for (var i = 0; i < PICK_LIST.length; i++) {
@@ -241,7 +241,7 @@ function getPickList() {
             PICK_LIST_TEAM_KEY.push(PICK_LIST[i][1]);
             PICK_LIST_ORDER.push(PICK_LIST[i][1]);
         }
-        console.log(PICK_LIST_TEAM_KEY);
+        //console.log(PICK_LIST_TEAM_KEY);
         if (PICK_LIST_OBJECTS.length != TEAMS.length || PICK_LIST_OBJECTS.length == 0) {
             var pickListTeamsIncluded = [];
             for (var p = 0; p < PICK_LIST_OBJECTS.length; p++) {
@@ -255,7 +255,7 @@ function getPickList() {
                 }
             }
         }
-        console.log(PICK_LIST_OBJECTS);
+        //console.log(PICK_LIST_OBJECTS);
         resetRaw();
     }).catch(error => {
         console.log(error);
@@ -304,7 +304,7 @@ function getData() {
             }
         }
         TEAMS.sort(function (a, b) { return a - b });
-        console.log(TEAMS);
+        //console.log(TEAMS);
 
         localStorage.setItem("direction", 0);
         localStorage.setItem("column", -1);
@@ -859,13 +859,12 @@ function doGraph() {
 
             // Sorted teams
             var teamsSorted = [];
-            var newTeams = JSON.parse(JSON.stringify(TEAMS));
+            console.log(TEAM_ROWS)
             for (let i = 0; i < sortedGraphColumn.length; i++) {
-                for (let t = 0; t < newTeams.length; t++) {
-                    if (TEAM_ROWS[t][graphColumn] == sortedGraphColumn[i] && !teamsSorted.includes(newTeams[t])) {
-                        teamsSorted.push(newTeams[t]);
-                        newTeams.splice(t, 1);
-                        i--;
+                for (let t = 0; t < TEAM_ROWS.length; t++) {
+                    if (TEAM_ROWS[t][graphColumn] == sortedGraphColumn[i] && !teamsSorted.includes(TEAM_ROWS[t][0])) {
+                        teamsSorted.push(TEAM_ROWS[t][0]);
+                        console.log(i);
                         break;
                     }
                 }
@@ -997,10 +996,23 @@ function doGraph() {
             showMatrixGraph(graphCanvas, formattedData, matchesSorted, includedFields, "Description");
             break;
         case 4:
-            document.getElementById("graph-category-select").style.display = "block";
-            document.getElementById("graph-category-select-team").style.display = "block";
+            let teamSelect = document.getElementById("graph-category-select-team");
+            let valueSelect = document.getElementById("graph-category-select");
 
-            showLineGraph(graphCanvas, tempData, TEAM_FIELDS[graphColumn]);
+            valueSelect.style.display = "block";
+            teamSelect.style.display = "block";
+
+            let matches = [];
+            let teamFields = [];
+
+            for (let i = 0; i < RECORDS.length; i++) {
+                if (parseInt(RECORDS[i][0]) == parseInt(teamSelect.value) && !matches.includes(RECORDS[i][2])) {
+                    matches.push(parseInt(RECORDS[i][2]));
+                    teamFields.push(RECORDS[i][FIELDS.indexOf(TEAM_FIELDS[parseInt(valueSelect.value)])]);
+                }
+            }
+
+            showConsistencyLineGraph(graphCanvas, matches, teamFields, [teamSelect.value]);
             break;
         default:
             console.error("Invalid graph mode :(");
@@ -1305,7 +1317,7 @@ function sortColumn(colNum, type, records, columns, field, team, useCols) {
         for (var i = 0; i < cols.length; i++) {
             cols[i].style.background = "";
         }
-        if (direction % 3 == 0) {
+        if (direction % 3 == 1) {
             cols[colNum].style.background = 'linear-gradient(180deg, rgba(18,18,18,1) 0%, rgba(255,158,0,1) 100%)';
             cols[colNum].style.animation = `column-sort-up ${2.5}s linear infinite`;
         } else {
@@ -1318,9 +1330,9 @@ function sortColumn(colNum, type, records, columns, field, team, useCols) {
     if (type == 1) {
         var sortedColumn = JSON.parse(JSON.stringify(columns));
         //console.log(dir);
-        if (direction % 3 == 0) {
+        if (direction % 3 == 1) {
             sortedColumn = sortedColumn[colNum].sort(function (a, b) { return a - b });
-        } else if (direction % 3 == 1) {
+        } else if (direction % 3 == 0) {
             sortedColumn = sortedColumn[colNum].sort(function (a, b) { return b - a });
         } else {
             //console.log(team);
@@ -1436,69 +1448,6 @@ function sortColumn(colNum, type, records, columns, field, team, useCols) {
         console.error("Sad");
     }
 }
-
-// FOR TEAMS --------------------------------------------------
-
-/*function sortTeamColumn(colNum, type, col, dk) {
-    var direction = parseInt(localStorage.getItem("direction"));
-    console.log(direction);
-    var previousColumn = parseInt(localStorage.getItem("column"));
-    localStorage.setItem("column", colNum);
-    localStorage.setItem("direction", parseInt(direction) + 1);
-    if (previousColumn != colNum) {
-        direction = 0;
-        localStorage.setItem("direction", 1);
-    }
- 
-    if (type == 1) {
-        var sortedColumn = JSON.parse(JSON.stringify(TEAM_COLUMNS));
-        //console.log(dir);
-        console.log(sortedColumn);
-        //console.log(dk)
-        if (direction % 3 == 0) {
-            sortedColumn = sortedColumn[colNum].sort(function (a, b) { return a - b });
-        } else if (direction % 3 == 1) {
-            sortedColumn = sortedColumn[colNum].sort(function (a, b) { return b - a });
-        } else {
-            originalSort(TEAM_ROWS, TEAM_COLUMNS);
-            return;
-        }
- 
-        console.log(sortedColumn);
- 
-        var sortedRows = [];
-        var takenRows = [];
-        var counter = 0;
- 
-        var tempColumns = JSON.parse(JSON.stringify(TEAM_COLUMNS));
- 
-        for (var r = 0; r < TEAMS.length; r++) {
-            for (var i = 0; i < tempColumns[0].length; i++) {
-                //console.log(tempColumns[colNum][i]);
-                //console.log(takenRows.includes(i));
-                if (TEAM_COLUMNS[colNum][i] == sortedColumn[r] && !takenRows.includes(i)) {
-                    sortedRows[counter] = TEAM_ROWS[i];
-                    takenRows[counter] = i;
-                    counter++;
-                    break;
-                }
-            }
-        }
- 
-        var cols = document.getElementsByClassName("column");
-        for (var i = 0; i < TEAMS.length; i++) {
-            for (var s = 0; s < TEAM_COLUMNS.length; s++) {
-                console.log(sortedRows);
-                var tempCol = cols[s];
-                var temp = tempCol.children[i + 1];
-                temp.innerText = sortedRows[i][s];
-            }
-        }
- 
-    } else {
-        console.log("Sad");
-    }
-}*/
 
 function detectCharacter(val) {
     //console.log(val);
@@ -2036,7 +1985,7 @@ function getTeamList() {
 
     // Sorts teams by ascending number
     TEAMS.sort((a, b) => a - b);
-    console.log(TEAMS);
+    //console.log(TEAMS);
 }
 
 // Fetches all matches from specified event, adds video link if available
@@ -2072,7 +2021,7 @@ function getEventListTBA(url) {
     fetch(url, tbaOptions)
         .then((response) => response.json())
         .then((json) => {
-            console.log(json.length);
+            //console.log(json.length);
             eventSelect.innerHTML = "";
             // Sorts the array (smartly called 'json' for some reason) by object property name
             json = json.sort((a, b) => (a.name > b.name ? 1 : -1));
