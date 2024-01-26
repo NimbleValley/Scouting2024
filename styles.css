@@ -935,7 +935,7 @@ h9 {
 
 #breakdown-grid {
     position: absolute;
-    grid-template-columns: 62.5vh 1fr;
+    grid-template-columns: 45vh 1fr;
     grid-template-rows: 1fr 5fr;
     grid-column-gap: 2vh;
     grid-row-gap: 2vh;

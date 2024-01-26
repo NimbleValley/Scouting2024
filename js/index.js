@@ -33,8 +33,8 @@ const breakdownLines = document.getElementById("breakdown-lines-container");
 const breakdownGrid = document.getElementById("breakdown-grid");
 
 // FIXME important these match up, probably could improve
-const breakdownCategoryHeaders = ["Points"];
-const sortIndexes = [1];
+const breakdownCategoryHeaders = ["Total Points", "Auto Points", "Tele Points", "Endgame points", "Auto Speaker %", "Tele Speaker %", "Tele Amp", "Tele Speaker"];
+const sortIndexes = [4, 1, 2, 3, 7, 13, 14, 11];
 
 var firstbreakdown = true;
 
@@ -1248,11 +1248,20 @@ async function openTeamBreakdowns() {
     // Array of number of auto successes, corresponds with team_auto_types
     let team_auto_success = [];
 
-    // TODO this will have to be changed for 2024
     for (let g = 0; g < RECORDS.length; g++) {
         if (RECORDS[g][TEAM_INDEX] == document.getElementById("team-breakdown-select").value) {
             let tempAuto = "A";
-            // TODO CHANGE
+            // Auto speaker made & missed
+            tempAuto += RECORDS[g][8] + RECORDS[g][9];
+            
+            // Auto amp made & missed
+            tempAuto += RECORDS[g][11] + RECORDS[g][12];
+
+            if(RECORDS[g][13] == "Yes") {
+                tempAuto += "M";
+            }
+
+            console.log(tempAuto);
 
             // FIXME ADD LETERS IN HERE TO SET AUTO BASED ON POINTS & STUFF
             team_auto_success.push(1);
@@ -1289,7 +1298,7 @@ function getSortedIndex(colNum, records, columns) {
         }
     }
 
-    console.log(sortedRows);
+    //console.log(sortedRows);
 
     return sortedRows;
 }

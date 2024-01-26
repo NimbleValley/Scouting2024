@@ -3,8 +3,6 @@
 function runAutoPie(autoTypes, autoSuccess) {
 
     // TODO Change for 2024
-    const autoNames = ["A1pC", "A1pCM", "A2pCM", "A3pCM", "A1p", "A1pM", "A2pM", "A3pM", "A", "AM", "AC", "ACM"];
-    const autoNameKeys = ["1P with Charge", "1P with Charge & Mobility", "2P with Charge and Mobility", "3P with Charge and Mobility", "1 Piece", "1P with Mobility", "2P with Mobility", "3P with Mobility", "No auto", "Only Mobility", "Only Charge", "Charge with Mobility"];
 
     let fillColors = ["#D62828", "#F77F00", "#FCBF49", "#9e997b", "#ffffff", "#ffea00"];
 
@@ -59,15 +57,30 @@ function runAutoPie(autoTypes, autoSuccess) {
     for (var i = 0; i < autoKeys.length; i++) {
         let tempAutoDescription = document.createElement("p");
         tempAutoDescription.className = "auto-breakdown-description";
-        if (autoNameKeys[autoNames.indexOf(autoKeys[i])]) {
-            tempAutoDescription.innerText = `${autoNameKeys[autoNames.indexOf(autoKeys[i])]}: ${autoWork[i]}/${autoNumbers[i]}`;
-        } else {
-            tempAutoDescription.innerText = `BAD DATA: ${autoWork[i]}/${autoNumbers[i]}`;
-        }
+        tempAutoDescription.innerText = `${decodeAutoKey(autoKeys[i])}: ${autoWork[i]}/${autoNumbers[i]}`;
         tempAutoDescription.style.color = fillColors[i % 6];
 
         tempAutoDescriptionContainer.appendChild(tempAutoDescription);
     }
 
     document.getElementById("breakdown-auto-container").appendChild(tempAutoDescriptionContainer);
+}
+
+// Decodes the auto key with certain parameters
+function decodeAutoKey(key) {
+    let output = "";
+
+    if (parseInt(key.substring(1, 2)) != 0) {
+        output += `${key.substring(1, 2)} speaker, `
+    }
+
+    if (parseInt(key.substring(2, 3)) != 0) {
+        output += `${key.substring(2, 3)} amplifier, `
+    }
+
+    if(key.includes("M")) {
+        output += `Mobility`
+    }
+
+    return output;
 }
