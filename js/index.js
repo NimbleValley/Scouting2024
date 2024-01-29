@@ -93,6 +93,8 @@ var TEAMS_DUMB = new Array();
 // Array of how many times each team drove reckless
 var TEAMS_RECKLESS = new Array();
 
+var highlightTeamData = true;
+
 const warningTypes = ["Flip/s", "Comm Issue/s", "Disabled", "Unintelligent", "Reckless"];
 
 
@@ -1250,7 +1252,7 @@ async function openTeamBreakdowns() {
     tempRange.innerText = `Mode speaker range: ${mode(speakerRanges)}`;
     tempRange.style.textDecoration = "underline";
     tempCommentContainer.insertBefore(tempRange, tempCommentContainer.children[1]);
-    
+
     let tempIntake = document.createElement("h1");
     tempIntake.className = "breakdown-comment";
     tempIntake.innerText = `Mode intake method: ${mode(intakeMethods)}`;
@@ -1465,6 +1467,20 @@ function sortColumn(colNum, type, records, columns, field, team, useCols) {
             }
             if (parseInt(localStorage.getItem("previousHighlightRow")) != -1) {
                 setTeamRowHighlight(localStorage.getItem("previousHighlightRow"), true);
+            }
+
+            if (highlightTeamData) {
+                let columnCopy = JSON.parse(JSON.stringify(TEAM_COLUMNS));
+                for (let c = 0; c < TEAM_COLUMNS.length-1; c++) {
+                    let cols = document.getElementsByClassName("column")[c];
+        
+                    let filteredColumn = [...new Set(columnCopy[c].sort((a, b) => a - b))];
+                    //console.log(filteredColumn);
+                    for(let i = 0; i < TEAM_COLUMNS[c].length; i ++) {
+                        let color = filteredColumn.indexOf(parseFloat(cols.children[i+1].innerText)) / (filteredColumn.length-1);
+                        cols.children[i+1].style.boxShadow = `0px 0px 0px 100vh inset rgba(${(1-color) * 255}, ${color*255}, 0, ${Math.pow(Math.abs(color - 0.5)*1.85, 2)})`;
+                    }
+                }
             }
         }
 
@@ -1983,6 +1999,20 @@ function getTeamData() {
         // Add comment text to correct position
         TEAM_ROWS[i].push(tempComment);
         TEAM_COLUMNS[dataToKeep.length].push(tempComment);
+    }
+
+    if (highlightTeamData) {
+        let columnCopy = JSON.parse(JSON.stringify(TEAM_COLUMNS));
+        for (let c = 0; c < TEAM_COLUMNS.length-1; c++) {
+            let cols = document.getElementsByClassName("column")[c];
+
+            let filteredColumn = [...new Set(columnCopy[c].sort((a, b) => a - b))];
+            console.log(filteredColumn);
+            for(let i = 0; i < TEAM_COLUMNS[c].length; i ++) {
+                let color = filteredColumn.indexOf(TEAM_COLUMNS[c][i]) / (filteredColumn.length-1);
+                cols.children[i+1].style.boxShadow = `0px 0px 0px 100vh inset rgba(${(1-color) * 255}, ${color*255}, 0, ${Math.pow(Math.abs(color - 0.5)*1.85, 2)})`;
+            }
+        }
     }
 
     // Adds click listeners to each header
