@@ -1229,16 +1229,33 @@ async function openTeamBreakdowns() {
     // Fetches matches for team, adds to comment section
     getTeamMatchesTBA(`https://www.thebluealliance.com/api/v3/team/frc${document.getElementById("team-breakdown-select").value}/event/${document.getElementById("event-select").value}/matches`);
 
+    let speakerRanges = [];
+    let intakeMethods = [];
+
     //let commentText = "Comments: ";
     for (var i = 0; i < RECORDS.length; i++) {
         if (RECORDS[i][TEAM_INDEX] == parseInt(document.getElementById("team-breakdown-select").value)) {
             let tempComment = document.createElement("h1");
             tempComment.className = "breakdown-comment";
-            // FIXME COMMENT INDEX WILL NEED TO BE CHANGED
-            tempComment.innerText = RECORDS[i][9];
+            tempComment.innerText = RECORDS[i][7];
             tempCommentContainer.appendChild(tempComment);
+
+            speakerRanges.push(RECORDS[i][26]);
+            intakeMethods.push(RECORDS[i][27]);
         }
     }
+
+    let tempRange = document.createElement("h1");
+    tempRange.className = "breakdown-comment";
+    tempRange.innerText = `Mode speaker range: ${mode(speakerRanges)}`;
+    tempRange.style.textDecoration = "underline";
+    tempCommentContainer.insertBefore(tempRange, tempCommentContainer.children[1]);
+    
+    let tempIntake = document.createElement("h1");
+    tempIntake.className = "breakdown-comment";
+    tempIntake.innerText = `Mode intake method: ${mode(intakeMethods)}`;
+    tempIntake.style.textDecoration = "underline";
+    tempCommentContainer.insertBefore(tempIntake, tempCommentContainer.children[2]);
 
     tempFeedbackContainer.appendChild(tempAutoContainer);
     tempFeedbackContainer.appendChild(tempCommentContainer);
@@ -1253,17 +1270,16 @@ async function openTeamBreakdowns() {
             let tempAuto = "A";
             // Auto speaker made & missed
             tempAuto += RECORDS[g][8] + RECORDS[g][9];
-            
+
             // Auto amp made & missed
             tempAuto += RECORDS[g][11] + RECORDS[g][12];
 
-            if(RECORDS[g][13] == "Yes") {
+            if (RECORDS[g][13] == "Yes") {
                 tempAuto += "M";
             }
 
             console.log(tempAuto);
 
-            // FIXME ADD LETERS IN HERE TO SET AUTO BASED ON POINTS & STUFF
             team_auto_success.push(1);
             team_auto_types.push(tempAuto);
         }
