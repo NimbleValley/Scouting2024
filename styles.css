@@ -550,7 +550,7 @@ p {
 #sidebar {
     position: fixed;
     background-color: black;
-    width: calc(25vh + 5vh);
+    width: calc(27vh + 5vh);
     height: calc(100vh - 1.5vh);
     z-index: 100;
     display: flex;
@@ -560,7 +560,7 @@ p {
 }
 
 #side-button-container {
-    width: 25vh;
+    width: 27vh;
     height: calc(100vh - 2.5vh);
     display: flex;
     flex-direction: column;
@@ -572,18 +572,18 @@ p {
     color: white;
     border-radius: 0.75vh;
     font-size: 3.5vh;
-    width: 20vh;
+    width: 22vh;
     padding: 1.25vh;
     margin-left: auto;
     margin-right: auto;
     margin-top: 1.5vh;
     font-weight: bolder;
-    transition: background-color 0.15s, scale 0.15s, text-shadow 0.15s, box-shadow 0.15s, border 0.15s, line-height 0.15s;
+    transition: background-color 0.175s, scale 0.15s, text-shadow 0.15s, box-shadow 0.15s, border 0.15s, line-height 0.15s, font-size 0.2s;
     text-align: center;
     border: 0.35vh solid #444444;
     text-shadow: #6c676700 0vh 0vh 1vh;
-    height: 5.5vh;
-    line-height: 5.35vh;
+    height: 6.5vh;
+    line-height: 6.15vh;
     user-select: none;
 }
 
@@ -592,28 +592,48 @@ p {
     text-shadow: #000000 0vh 0vh 1vh;
     border: 0.35vh solid #444444;
     box-shadow: none !important;
-    line-height: 4.5vh;
+    /*line-height: 4.5vh;*/
+    font-size: 3.95vh;
+    background-color: #2e2e2e;
 }
 
 .side-button::after {
     content: "";
     position: absolute;
-    width: 0%;
-    height: 50%;
+    width: 100%;
+    height: 100%;
     left: 0;
     top: 0;
-    background-color: #7979797b;
+    background-color: rgb(10, 10, 10);
     z-index: -1;
-    transition: width 0.15s, height 0.2s, background-color 0.25s;
+    transition: width 0.25s, height 0.25s, background-color 0.25s, left 0.25s, top 0.25s;
 }
 
 .side-button:hover::after {
-    width: 100%;
-    height: 50%;
-    background-color: #3a3530;
+    width: 0%;
+    height: 0%;
+    left: 50%;
+    top: 50%;
 }
 
 .side-button::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-color: #7979797b;
+    z-index: -2;
+    /*opacity: 0.75;*/
+    transition: opacity 0.15s;
+}
+
+.side-button:hover::before {
+    opacity: 1;
+}
+
+/*.side-button::before {
     content: "";
     position: absolute;
     width: 0%;
@@ -629,7 +649,7 @@ p {
     width: 100%;
     height: 50%;
     background-color: #3a3530;
-}
+}*/
 
 .active {
     border: 0.55vh solid rgb(189, 95, 33);

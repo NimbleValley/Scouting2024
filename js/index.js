@@ -93,7 +93,11 @@ var TEAMS_DUMB = new Array();
 // Array of how many times each team drove reckless
 var TEAMS_RECKLESS = new Array();
 
-var highlightTeamData = true;
+var highlightTeamData = false;
+const highlightSelect = document.getElementById("highlight-select");
+highlightSelect.addEventListener('change', function () {
+    highlightTeamData = JSON.parse(highlightSelect.value);
+});
 
 const warningTypes = ["Flip/s", "Comm Issue/s", "Disabled", "Unintelligent", "Reckless"];
 
@@ -1471,14 +1475,14 @@ function sortColumn(colNum, type, records, columns, field, team, useCols) {
 
             if (highlightTeamData) {
                 let columnCopy = JSON.parse(JSON.stringify(TEAM_COLUMNS));
-                for (let c = 0; c < TEAM_COLUMNS.length-1; c++) {
+                for (let c = 0; c < TEAM_COLUMNS.length - 1; c++) {
                     let cols = document.getElementsByClassName("column")[c];
-        
+
                     let filteredColumn = [...new Set(columnCopy[c].sort((a, b) => a - b))];
                     //console.log(filteredColumn);
-                    for(let i = 0; i < TEAM_COLUMNS[c].length; i ++) {
-                        let color = filteredColumn.indexOf(parseFloat(cols.children[i+1].innerText)) / (filteredColumn.length-1);
-                        cols.children[i+1].style.boxShadow = `0px 0px 0px 100vh inset rgba(${(1-color) * 255}, ${color*255}, 0, ${Math.pow(Math.abs(color - 0.5)*1.85, 2)})`;
+                    for (let i = 0; i < TEAM_COLUMNS[c].length; i++) {
+                        let color = filteredColumn.indexOf(parseFloat(cols.children[i + 1].innerText)) / (filteredColumn.length - 1);
+                        cols.children[i + 1].style.boxShadow = `0px 0px 0px 100vh inset rgba(${(1 - color) * 255}, ${color * 255}, 0, ${Math.pow(Math.abs(color - 0.5) * 1.85, 2)})`;
                     }
                 }
             }
@@ -1515,7 +1519,7 @@ function toggleSidebar() {
         //tl.to(rawTable, { marginLeft: "23vw", duration: 0.5, ease: "power2"}, "-=0.5");
         tl.to(openSidebarButton, { scale: "1 1", duration: 0.5, ease: "power2" }, "-=0.5");
     } else {
-        tl.to(sidebar, { left: "-25vh", duration: 0.5, ease: "power2" });
+        tl.to(sidebar, { left: "-27vh", duration: 0.5, ease: "power2" });
         //tl.to(rawTable, { marginLeft: "3vw", duration: 0.5, ease: "power2"}, "-=0.5");
         tl.to(openSidebarButton, { scale: "-1 1", duration: 0.5, ease: "power2" }, "-=0.5");
     }
@@ -2003,14 +2007,14 @@ function getTeamData() {
 
     if (highlightTeamData) {
         let columnCopy = JSON.parse(JSON.stringify(TEAM_COLUMNS));
-        for (let c = 0; c < TEAM_COLUMNS.length-1; c++) {
+        for (let c = 0; c < TEAM_COLUMNS.length - 1; c++) {
             let cols = document.getElementsByClassName("column")[c];
 
             let filteredColumn = [...new Set(columnCopy[c].sort((a, b) => a - b))];
             console.log(filteredColumn);
-            for(let i = 0; i < TEAM_COLUMNS[c].length; i ++) {
-                let color = filteredColumn.indexOf(TEAM_COLUMNS[c][i]) / (filteredColumn.length-1);
-                cols.children[i+1].style.boxShadow = `0px 0px 0px 100vh inset rgba(${(1-color) * 255}, ${color*255}, 0, ${Math.pow(Math.abs(color - 0.5)*1.85, 2)})`;
+            for (let i = 0; i < TEAM_COLUMNS[c].length; i++) {
+                let color = filteredColumn.indexOf(TEAM_COLUMNS[c][i]) / (filteredColumn.length - 1);
+                cols.children[i + 1].style.boxShadow = `0px 0px 0px 100vh inset rgba(${(1 - color) * 255}, ${color * 255}, 0, ${Math.pow(Math.abs(color - 0.5) * 1.85, 2)})`;
             }
         }
     }
