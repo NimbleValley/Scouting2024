@@ -93,7 +93,7 @@ body {
     text-align: center;
     font-size: 2.5vh;
     color: white;
-    transition: background-color 0.15s, height 0.15s, text-shadow 0.15s, box-shadow 0.25s;
+    transition: background-color 0.15s, height 0.15s, text-shadow 0.15s, box-shadow 0.25s, border-radius 0.25s;
     background-color: #474540;
     z-index: 10;
     margin-left: 0.5vh;
@@ -123,6 +123,7 @@ body {
     background-color: #1b1b1b !important;
     text-shadow: #161311 0px 0px 1vh;
     box-shadow: inset #131313 0vh 0vh 0vh 0.5vh;
+    border-radius: 0px;
 }
 
 .modal {

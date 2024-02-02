@@ -523,14 +523,14 @@ function setRowHighlight(row, always) {
         }
     }
 
-    if (localStorage.getItem("previousHighlightRow") != row || always) {
-        localStorage.setItem("previousHighlightRow", row);
+    if (localStorage.getItem("previousHighlightRawRow") != row || always) {
+        localStorage.setItem("previousHighlightRawRow", row);
         for (let c = 0; c < cols.length; c++) {
             // For now I'm just casting row as an integer ;)
             cols[c].children[parseInt(row) + 1].style.setProperty("background-color", "#a8652d", "important");
         }
     } else {
-        localStorage.setItem("previousHighlightRow", -1);
+        localStorage.setItem("previousHighlightRawRow", -1);
     }
 }
 
