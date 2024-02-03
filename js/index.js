@@ -93,11 +93,17 @@ var TEAMS_DUMB = new Array();
 // Array of how many times each team drove reckless
 var TEAMS_RECKLESS = new Array();
 
-var highlightTeamData = false;
+var highlightTeamData;
+
+localStorage.getItem("team-color-rank-highlight") != null ? highlightTeamData = JSON.parse(localStorage.getItem("team-color-rank-highlight")) : highlightTeamData = false;
+
 const highlightSelect = document.getElementById("highlight-select");
 highlightSelect.addEventListener('change', function () {
     highlightTeamData = JSON.parse(highlightSelect.value);
+    localStorage.setItem("team-color-rank-highlight", highlightSelect.value);
 });
+
+highlightSelect.value = highlightTeamData;
 
 const warningTypes = ["Flip/s", "Comm Issue/s", "Disabled", "Unintelligent", "Reckless"];
 
@@ -1516,11 +1522,11 @@ function toggleSidebar() {
 
     if (sidebarOpen) {
         tl.to(sidebar, { left: "0vh", duration: 0.5, ease: "power2" });
-        //tl.to(rawTable, { marginLeft: "23vw", duration: 0.5, ease: "power2"}, "-=0.5");
+        //tl.to("#team-breakdown-select", { left: "0vh", duration: 0.5, ease: "power2" });
         tl.to(openSidebarButton, { scale: "1 1", duration: 0.5, ease: "power2" }, "-=0.5");
     } else {
         tl.to(sidebar, { left: "-27vh", duration: 0.5, ease: "power2" });
-        //tl.to(rawTable, { marginLeft: "3vw", duration: 0.5, ease: "power2"}, "-=0.5");
+        //tl.to("#team-breakdown-select", { left: "34vh", duration: 0.5, ease: "power2" });
         tl.to(openSidebarButton, { scale: "-1 1", duration: 0.5, ease: "power2" }, "-=0.5");
     }
 }

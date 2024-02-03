@@ -1,9 +1,5 @@
 ---- ISSUES ----
 
-FIXME 1 VALUE BAR GRAPHS HAVE TEAMS IN WRONG ORDER   D: ):  ):<
-
-Sometimes dorting takes multiple clicks in team tab, check localStorage?
-
 Breakdowns take too long to run, why is the setup called multiple times? 
 Also team data doesn't need to populate rows for breakdown, useless waste of time 
 
@@ -12,8 +8,6 @@ Also team data doesn't need to populate rows for breakdown, useless waste of tim
 ---- NEW FEATURES ----
 
 ADD SPIDER GRAPHS
-
-ADD CONSISTANCY FOR EVERY STAT, SHOW TRENDS
 
 Add team similarity insights
 
@@ -25,10 +19,8 @@ Make autos more stimulating, maybe a drag and drop to visualize paths???
 
 ---- UPDATE OLD FEATURES ----
 
-Make compare tab useful 
+Merge comparisons with graph tab probably
 
 If time make match tab functional?
-
-Migrate graph tab to a canvas element or use a library - Definately needs rework
 
 Take a look at the sorting parameters, they seem strange & unnecessary
