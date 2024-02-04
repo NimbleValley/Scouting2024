@@ -1928,12 +1928,13 @@ function getTeamData() {
     for (let g = 0; g < dataToKeep.length + 1; g++) {
         TEAM_COLUMNS[g] = new Array();
     }
-    for (let t = 0; t < TEAMS.length; t++) {
-        TEAM_ROWS[t] = new Array();
-    }
+
+    let tempCols = document.getElementsByClassName("column");
 
     // Iterates through every team (basically makes each row)
     for (let i = 0; i < TEAMS.length; i++) {
+        TEAM_ROWS[i] = new Array();
+
         // List of every row of raw data for team
         let teamRows = [];
 
@@ -1999,12 +2000,42 @@ function getTeamData() {
 
         // Temp comment text
         let tempComment = "";
+
+        let autoSpeakerTotal = 0;
+        let teleSpeakerTotal = 0;
+
+        let autoSpeakerTotalMade = 0;
+        let teleSpeakerTotalMade = 0;
+
         for (let q = 0; q < RECORDS.length; q++) {
             // Find all comments for current team, add to variable
             if (RECORDS[q][TEAM_INDEX] == TEAMS[i]) {
                 tempComment += RECORDS[q][FIELDS.indexOf("Comments")] + "\n";
+
+                // Adds to auto & tele speaker totals, for percents
+                autoSpeakerTotal += parseInt(RECORDS[q][8]) + parseInt(RECORDS[q][9]);
+                autoSpeakerTotalMade += parseInt(RECORDS[q][8]);
+                teleSpeakerTotal += parseInt(RECORDS[q][16]) + parseInt(RECORDS[q][17]);
+                teleSpeakerTotalMade += parseInt(RECORDS[q][16]);
             }
         }
+
+        if(autoSpeakerTotal == 0) {
+            autoSpeakerTotal = 1;
+        }
+
+        if(teleSpeakerTotal == 0) {
+            teleSpeakerTotal = 1;
+        }
+
+        TEAM_ROWS[i][7] = Math.round(autoSpeakerTotalMade/autoSpeakerTotal*1000)/10;
+        TEAM_ROWS[i][13] = Math.round(teleSpeakerTotalMade/teleSpeakerTotal*1000)/10;
+
+        TEAM_COLUMNS[7][i] = Math.round(autoSpeakerTotalMade/autoSpeakerTotal*1000)/10;
+        TEAM_COLUMNS[13][i] = Math.round(teleSpeakerTotalMade/teleSpeakerTotal*1000)/10;
+
+        tempCols[7].children[i+1].innerText = TEAM_COLUMNS[7][i];
+        tempCols[13].children[i+1].innerText = TEAM_COLUMNS[13][i];
 
         // Add comment text to correct position
         TEAM_ROWS[i].push(tempComment);
