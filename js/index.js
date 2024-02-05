@@ -33,8 +33,8 @@ const breakdownLines = document.getElementById("breakdown-lines-container");
 const breakdownGrid = document.getElementById("breakdown-grid");
 
 // FIXME important these match up, probably could improve
-const breakdownCategoryHeaders = ["Total Points", "Auto Points", "Tele Points", "Endgame points", "Auto Speaker %", "Tele Speaker %", "Tele Amp", "Tele Speaker"];
-const sortIndexes = [4, 1, 2, 3, 7, 13, 14, 11];
+const breakdownCategoryHeaders = ["Total Points", "Auto Points", "Tele Points", "Endgame points", "Tele Amp", "Tele Speaker"];
+const sortIndexes = [4, 1, 2, 3, 14, 11];
 
 var firstbreakdown = true;
 
@@ -1163,6 +1163,10 @@ async function openTeamBreakdowns() {
 
     // Iterates through each column, but skips team number
     for (let i = 1; i < TEAM_COLUMNS.length - 1; i++) {
+        if (TEAM_FIELDS[i] == "Auto Piece Selection") {
+            continue;
+        }
+
         // Rectangular container
         let tempDataContainer = document.createElement("div");
         tempDataContainer.className = "breakdown-data";
@@ -1183,6 +1187,63 @@ async function openTeamBreakdowns() {
     // Container for issues, autos, comments, etc.
     let tempFeedbackContainer = document.getElementById("feedback-container");
     tempFeedbackContainer.innerHTML = "";
+
+    let currentTeam = parseInt(document.getElementById("team-breakdown-select").value);
+
+    // All of current team's rows
+    let tempTeamRows = [];
+    for (let i = 0; i < RECORDS.length; i++) {
+        if (parseInt(RECORDS[i][0]) == currentTeam) {
+            tempTeamRows.push(RECORDS[i]);
+        }
+    }
+
+    let tempPercentGraphContainer = document.createElement("div");
+    tempPercentGraphContainer.id = "breakdown-percentages-container";
+
+    // Auto speaker
+    let tempAutoSpeakerTotal = 0;
+    let tempAutoSpeakerMade = 0;
+    for (let i = 0; i < tempTeamRows.length; i++) {
+        tempAutoSpeakerTotal += parseInt(tempTeamRows[i][16] + tempTeamRows[i][17]);
+        tempAutoSpeakerMade += parseInt(tempTeamRows[i][16]);
+    }
+    tempPercentGraphContainer.appendChild(getBreakdownPercentPie("Auto Speaker", tempAutoSpeakerTotal, tempAutoSpeakerMade));
+
+    // Tele speaker
+    let tempTeleSpeakerTotal = 0;
+    let tempTeleSpeakerMade = 0;
+    for (let i = 0; i < tempTeamRows.length; i++) {
+        tempTeleSpeakerTotal += parseInt(tempTeamRows[i][8] + tempTeamRows[i][9]);
+        tempTeleSpeakerMade += parseInt(tempTeamRows[i][8]);
+    }
+    tempPercentGraphContainer.appendChild(getBreakdownPercentPie("Tele Speaker", tempTeleSpeakerTotal, tempTeleSpeakerMade));
+
+    let tempTrapTotal = 0;
+    let tempTrapMade = 0;
+    for (let i = 0; i < tempTeamRows.length; i++) {
+        if (tempTeamRows[i][22] == "Successful") {
+            tempTrapTotal++;
+            tempTrapMade++;
+        } else if(tempTeamRows[i][22] == "Failed") {
+            tempTrapTotal++;
+        }
+    }
+    tempPercentGraphContainer.appendChild(getBreakdownPercentPie("Trap", tempTrapTotal, tempTrapMade));
+
+    let tempClimbTotal = 0;
+    let tempClimbMade = 0;
+    for (let i = 0; i < tempTeamRows.length; i++) {
+        if (tempTeamRows[i][21] == "Successful") {
+            tempClimbTotal++;
+            tempClimbMade++;
+        } else if(tempTeamRows[i][21] == "Failed") {
+            tempClimbTotal++;
+        }
+    }
+    tempPercentGraphContainer.appendChild(getBreakdownPercentPie("Climb", tempClimbTotal, tempClimbMade));
+
+    tempFeedbackContainer.appendChild(tempPercentGraphContainer);
 
     // Container for warnings, child of feedback container
     let tempWarningContainer = document.createElement("div");
@@ -1234,42 +1295,118 @@ async function openTeamBreakdowns() {
     autoPie.id = "auto-pie-chart";
     tempAutoContainer.appendChild(autoPie);
 
+    let tempAutoFloorContainer = document.createElement("div");
+    tempAutoFloorContainer.id = "breakdown-auto-floor-container";
+
+
+
+    // Auto floor section, includes select & field top-down image
+    let tempFloorContainer = document.createElement("div");
+    tempFloorContainer.id = "auto-floor-container";
+
+    let tempFloorImageContainer = document.createElement("div");
+    tempFloorImageContainer.id = "floor-image-container";
+    tempFloorImageContainer.style.backgroundImage = `url(img/${tempTeamRows[0][1].substring(0,1) == "B" ? "blue" : "red"}field24.jpg)`;
+
+    // Add notes in, two containers, one with 3 & one with 5
+    let upperNoteContainer = document.createElement("div");
+    upperNoteContainer.className = "horizontal-note-container";
+    tempFloorImageContainer.appendChild(upperNoteContainer);
+
+    let lowerNoteContainer = document.createElement("div");
+    lowerNoteContainer.className = "horizontal-note-container";
+    lowerNoteContainer.style.width = "55%";
+    lowerNoteContainer.style.marginLeft = "5%";
+    tempFloorImageContainer.appendChild(lowerNoteContainer);
+
+    for(let i = 0; i < 5; i ++) {
+        let tempNote = document.createElement("div");
+        tempNote.className = "breakdown-floor-note";
+        tempNote.id = i;
+
+        upperNoteContainer.appendChild(tempNote);
+    }
+
+    if(tempTeamRows[0][1].substring(0,1) == "R") {
+        upperNoteContainer.style.scale = -1;
+        lowerNoteContainer.style.scale = -1;
+    }
+
+    for(let i = 0; i < 3; i ++) {
+        let tempNote = document.createElement("div");
+        tempNote.className = "breakdown-floor-note";
+
+        tempNote.id = i+5;
+
+        lowerNoteContainer.appendChild(tempNote);
+
+        lowerNoteContainer.style.marginLeft = "40%";
+    }
+
+    tempFloorContainer.appendChild(tempFloorImageContainer);
+
+
+
     let tempCommentContainer = document.createElement("div");
     tempCommentContainer.id = "breakdown-comment-container";
-    tempCommentContainer.innerHTML = "<span style='text-decoration: underline'>Comments & Videos:</span>";
+    tempCommentContainer.innerHTML = "<span style='text-decoration: underline; width: 100%; display: block'>Feedback & Videos:</span>";
 
     // Fetches matches for team, adds to comment section
     getTeamMatchesTBA(`https://www.thebluealliance.com/api/v3/team/frc${document.getElementById("team-breakdown-select").value}/event/${document.getElementById("event-select").value}/matches`);
 
     let speakerRanges = [];
     let intakeMethods = [];
+    let trapCounter = 0;
+    let climbSpeeds = [];
 
     //let commentText = "Comments: ";
-    for (var i = 0; i < RECORDS.length; i++) {
-        if (RECORDS[i][TEAM_INDEX] == parseInt(document.getElementById("team-breakdown-select").value)) {
+    for (var i = 0; i < tempTeamRows.length; i++) {
             let tempComment = document.createElement("h1");
             tempComment.className = "breakdown-comment";
-            tempComment.innerText = RECORDS[i][7];
+            tempComment.innerHTML = `<span style='color: rgb(255, 221, 109)'>Qual ${tempTeamRows[i][2]}:</span> ${tempTeamRows[i][7]}`;
             tempCommentContainer.appendChild(tempComment);
 
-            speakerRanges.push(RECORDS[i][26]);
-            intakeMethods.push(RECORDS[i][27]);
-        }
+            speakerRanges.push(tempTeamRows[i][26]);
+            intakeMethods.push(tempTeamRows[i][27]);
+
+            if (tempTeamRows[i][24] != "N/A") {
+                climbSpeeds.push(tempTeamRows[i][24]);
+            }
+
+            if (tempTeamRows[i][22] == "Successful") {
+                trapCounter++;
+            }
     }
 
+    let teamFeatureContainer = document.createElement("div");
+    teamFeatureContainer.id = "team-feature-container";
+
     let tempRange = document.createElement("h1");
-    tempRange.className = "breakdown-comment";
-    tempRange.innerText = `Mode speaker range: ${mode(speakerRanges)}`;
-    tempRange.style.textDecoration = "underline";
-    tempCommentContainer.insertBefore(tempRange, tempCommentContainer.children[1]);
+    tempRange.className = "team-feature";
+    tempRange.innerHTML = `Speaker range: <span style='font-weight: bold; font-size: 3vh; margin-left: 1vh; color: #ffa552'>${mode(speakerRanges)}</span>`;
+    teamFeatureContainer.appendChild(tempRange);
 
     let tempIntake = document.createElement("h1");
-    tempIntake.className = "breakdown-comment";
-    tempIntake.innerText = `Mode intake method: ${mode(intakeMethods)}`;
-    tempIntake.style.textDecoration = "underline";
-    tempCommentContainer.insertBefore(tempIntake, tempCommentContainer.children[2]);
+    tempIntake.className = "team-feature";
+    tempIntake.innerHTML = `Intake method: <span style='font-weight: bold; font-size: 3vh; margin-left: 1vh; color: #ffa552'>${mode(intakeMethods)}</span>`;
+    teamFeatureContainer.appendChild(tempIntake);
 
-    tempFeedbackContainer.appendChild(tempAutoContainer);
+    let tempTrap = document.createElement("h1");
+    tempTrap.className = "team-feature";
+    tempTrap.innerHTML = `Trapped: <span style='font-weight: bold; font-size: 3vh; margin-left: 1vh; color: #ffa552'>${trapCounter == 0 ? "No" : `${trapCounter} Traps`}</span>`;
+    teamFeatureContainer.appendChild(tempTrap);
+
+    let tempClimbSpeed = document.createElement("h1");
+    tempClimbSpeed.className = "team-feature";
+    tempClimbSpeed.innerHTML = `Climb speed: <span style='font-weight: bold; font-size: 3vh; margin-left: 1vh; color: #ffa552'>${mode(climbSpeeds) == null ? "Didn't climb" : mode(climbSpeeds)}</span>`;
+    teamFeatureContainer.appendChild(tempClimbSpeed);
+
+    tempCommentContainer.insertBefore(teamFeatureContainer, tempCommentContainer.children[1]);
+
+    tempAutoFloorContainer.appendChild(tempAutoContainer);
+    tempAutoFloorContainer.appendChild(tempFloorContainer);
+
+    tempFeedbackContainer.appendChild(tempAutoFloorContainer);
     tempFeedbackContainer.appendChild(tempCommentContainer);
 
     // Array of all team auto types
@@ -1556,7 +1693,28 @@ function setUpPickList() {
 
         tempTeam.appendChild(tempTeamText);
 
-        //console.log(TEAMS_FLIPPED)
+        if (TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][13] < 65) {
+            let tempWarning = document.createElement("div");
+            tempWarning.className = "warning-container";
+            let tempWarningText = document.createElement("div");
+            tempWarningText.className = "warning-popup";
+            tempWarning.appendChild(tempWarningText);
+            tempWarning.style.backgroundImage = "url('svg/target-bad.svg')";
+            tempWarningText.innerText = "Tele Speaker Accuracy " + TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][13] + "%";
+            tempTeam.appendChild(tempWarning);
+        }
+
+        if (TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][13] > 80) {
+            let tempWarning = document.createElement("div");
+            tempWarning.className = "warning-container";
+            let tempWarningText = document.createElement("div");
+            tempWarningText.className = "warning-popup";
+            tempWarning.appendChild(tempWarningText);
+            tempWarning.style.backgroundImage = "url('svg/target-good.svg')";
+            tempWarningText.innerText = "Tele Speaker Accuracy " + TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][13] + "%";
+            tempTeam.appendChild(tempWarning);
+        }
+
         if (TEAMS_FLIPPED.includes(PICK_LIST_OBJECTS[i].getTeam())) {
             let tempWarning = document.createElement("div");
             tempWarning.className = "warning-container";
@@ -2020,22 +2178,22 @@ function getTeamData() {
             }
         }
 
-        if(autoSpeakerTotal == 0) {
+        if (autoSpeakerTotal == 0) {
             autoSpeakerTotal = 1;
         }
 
-        if(teleSpeakerTotal == 0) {
+        if (teleSpeakerTotal == 0) {
             teleSpeakerTotal = 1;
         }
 
-        TEAM_ROWS[i][7] = Math.round(autoSpeakerTotalMade/autoSpeakerTotal*1000)/10;
-        TEAM_ROWS[i][13] = Math.round(teleSpeakerTotalMade/teleSpeakerTotal*1000)/10;
+        TEAM_ROWS[i][7] = Math.round(autoSpeakerTotalMade / autoSpeakerTotal * 1000) / 10;
+        TEAM_ROWS[i][13] = Math.round(teleSpeakerTotalMade / teleSpeakerTotal * 1000) / 10;
 
-        TEAM_COLUMNS[7][i] = Math.round(autoSpeakerTotalMade/autoSpeakerTotal*1000)/10;
-        TEAM_COLUMNS[13][i] = Math.round(teleSpeakerTotalMade/teleSpeakerTotal*1000)/10;
+        TEAM_COLUMNS[7][i] = Math.round(autoSpeakerTotalMade / autoSpeakerTotal * 1000) / 10;
+        TEAM_COLUMNS[13][i] = Math.round(teleSpeakerTotalMade / teleSpeakerTotal * 1000) / 10;
 
-        tempCols[7].children[i+1].innerText = TEAM_COLUMNS[7][i];
-        tempCols[13].children[i+1].innerText = TEAM_COLUMNS[13][i];
+        tempCols[7].children[i + 1].innerText = TEAM_COLUMNS[7][i];
+        tempCols[13].children[i + 1].innerText = TEAM_COLUMNS[13][i];
 
         // Add comment text to correct position
         TEAM_ROWS[i].push(tempComment);

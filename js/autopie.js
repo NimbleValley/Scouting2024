@@ -2,8 +2,6 @@
 // Creates auto pie chart
 function runAutoPie(autoTypes, autoSuccess) {
 
-    // TODO Change for 2024
-
     let fillColors = ["#D62828", "#F77F00", "#FCBF49", "#9e997b", "#ffffff", "#ffea00"];
 
     let autoNumbers = [];
@@ -78,9 +76,49 @@ function decodeAutoKey(key) {
         output += `${key.substring(2, 3)} amplifier, `
     }
 
-    if(key.includes("M")) {
+    if (key.includes("M")) {
         output += `Mobility`
     }
 
     return output;
+}
+
+function getBreakdownPercentPie(description, total, made) {
+
+    let tempContainer = document.createElement("div");
+    tempContainer.className = "breakdown-percent-container";
+
+    const canvas = document.createElement("canvas");
+    canvas.className = "breakdown-percent-canvas";
+    canvas.width = window.innerHeight * (12 / 100);
+    canvas.height = window.innerHeight * (12 / 100);
+    const ctx = canvas.getContext("2d");
+
+    let tempDescription = document.createElement("p");
+    tempDescription.className = "breakdown-percent-description";
+    tempDescription.innerText = `${description}: ${isNaN(Math.round(made/total*100)) ? "0" : Math.round(made/total*100)}% (${made}/${total})`;
+    
+    if(total == 0) {
+        total = 1;
+    }
+
+    addFactor = made/total;
+
+    ctx.beginPath();
+    ctx.arc(canvas.width * (1 / 2), canvas.height * (1 / 2), canvas.height * (1 / 2), 0, (addFactor * (Math.PI * 2)));
+    ctx.fillStyle = `rgb(${(1.25-addFactor)*255}, ${((addFactor-0.5)*3) * 255}, 0)`;
+    ctx.lineTo(canvas.width * (1 / 2), canvas.height * (1 / 2));
+    ctx.fill();
+
+    ctx.beginPath();
+
+    ctx.lineWidth = window.innerHeight / 200;
+    ctx.strokeStyle = "#555555";
+    ctx.arc(canvas.width * (1 / 2), canvas.height * (1 / 2), canvas.height * (1 / 2.025), 0, (Math.PI * 2));
+    ctx.stroke();
+
+    tempContainer.appendChild(canvas);
+    tempContainer.appendChild(tempDescription);
+
+    return tempContainer;
 }

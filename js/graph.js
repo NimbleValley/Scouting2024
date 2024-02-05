@@ -273,7 +273,6 @@ function mergeScatterData(teamData2d) {
             labels.push(teamData2d[i].team);
             xValues.push(teamData2d[i].x);
             yValues.push(teamData2d[i].y);
-            console.log(i);
         }
     }
 
