@@ -1201,12 +1201,18 @@ async function openTeamBreakdowns() {
     let tempPercentGraphContainer = document.createElement("div");
     tempPercentGraphContainer.id = "breakdown-percentages-container";
 
+    // Team's matches, pickups
+    let tempTeamMatches = [];
+    let tempTeamAutoPickups = [];
+
     // Auto speaker
     let tempAutoSpeakerTotal = 0;
     let tempAutoSpeakerMade = 0;
     for (let i = 0; i < tempTeamRows.length; i++) {
         tempAutoSpeakerTotal += parseInt(tempTeamRows[i][16] + tempTeamRows[i][17]);
         tempAutoSpeakerMade += parseInt(tempTeamRows[i][16]);
+        tempTeamMatches.push(parseInt(tempTeamRows[i][2]));
+        tempTeamAutoPickups.push(tempTeamRows[i][14]);
     }
     tempPercentGraphContainer.appendChild(getBreakdownPercentPie("Auto Speaker", tempAutoSpeakerTotal, tempAutoSpeakerMade));
 
@@ -1304,6 +1310,7 @@ async function openTeamBreakdowns() {
     let tempFloorContainer = document.createElement("div");
     tempFloorContainer.id = "auto-floor-container";
 
+    // Background image & notes
     let tempFloorImageContainer = document.createElement("div");
     tempFloorImageContainer.id = "floor-image-container";
     tempFloorImageContainer.style.backgroundImage = `url(img/${tempTeamRows[0][1].substring(0,1) == "B" ? "blue" : "red"}field24.jpg)`;
@@ -1313,12 +1320,14 @@ async function openTeamBreakdowns() {
     upperNoteContainer.className = "horizontal-note-container";
     tempFloorImageContainer.appendChild(upperNoteContainer);
 
+    // Lower, 3 notes
     let lowerNoteContainer = document.createElement("div");
     lowerNoteContainer.className = "horizontal-note-container";
     lowerNoteContainer.style.width = "55%";
     lowerNoteContainer.style.marginLeft = "5%";
     tempFloorImageContainer.appendChild(lowerNoteContainer);
 
+    // Add notes to upper container
     for(let i = 0; i < 5; i ++) {
         let tempNote = document.createElement("div");
         tempNote.className = "breakdown-floor-note";
@@ -1326,12 +1335,15 @@ async function openTeamBreakdowns() {
 
         upperNoteContainer.appendChild(tempNote);
     }
-
+    
+    // If the field is red, alter styling to mirror
     if(tempTeamRows[0][1].substring(0,1) == "R") {
         upperNoteContainer.style.scale = -1;
         lowerNoteContainer.style.scale = -1;
+        lowerNoteContainer.style.marginLeft = "40%";
     }
-
+    
+    // Add notes to lower container
     for(let i = 0; i < 3; i ++) {
         let tempNote = document.createElement("div");
         tempNote.className = "breakdown-floor-note";
@@ -1340,9 +1352,54 @@ async function openTeamBreakdowns() {
 
         lowerNoteContainer.appendChild(tempNote);
 
-        lowerNoteContainer.style.marginLeft = "40%";
     }
 
+    // Initial floor notes
+    let tempTempNotes = document.getElementsByClassName("breakdown-floor-note");
+    for(let i = 0; i < tempTeamAutoPickups.length; i ++) {
+        if(tempTeamAutoPickups[i] == null) {
+            break;
+        }
+        tempTempNotes[parseInt(tempTeamAutoPickups[i])%8].style.backgroundColor = parseInt(tempTeamAutoPickups[i]) > 7 ? "rgba(255, 0, 0, 0.4)" : "rgba(0, 255, 0, 0.4)";
+    }
+
+    // Create sidebar
+    let tempAutoFloorSidebarContainer = document.createElement("div");
+    tempAutoFloorSidebarContainer.id = "auto-floor-sidebar-container";
+    
+    // Sidebar select for match numbers
+    let tempAutoFloorMatchSelect = document.createElement("select");
+    tempAutoFloorMatchSelect.style.width = "20vh";
+    for(let i = 0; i < tempTeamMatches.length; i ++) {
+        let tempOption = document.createElement("option");
+        tempOption.value = String(tempTeamAutoPickups[i]);
+        tempOption.innerText = tempTeamMatches[i];
+        tempAutoFloorMatchSelect.appendChild(tempOption);
+    }
+
+    tempAutoFloorMatchSelect.addEventListener("change", function() {
+        let tempNoteLocations = document.getElementsByClassName("breakdown-floor-note");
+
+        for(let i = 0; i < tempNoteLocations.length; i ++) {
+            tempNoteLocations[i].style.backgroundColor = "transparent";
+        }
+
+        let tempLocationsArray = this.value.split(',');
+        console.log(tempLocationsArray);
+
+        for(let i = 0; i < tempLocationsArray.length; i ++) {
+            if(tempLocationsArray[i] == "null") {
+                break;
+            }
+            tempNoteLocations[parseInt(tempLocationsArray[i])%8].style.backgroundColor = parseInt(tempLocationsArray[i]) > 7 ? "rgba(255, 0, 0, 0.4)" : "rgba(0, 255, 0, 0.4)";
+        }
+    });
+
+    tempAutoFloorSidebarContainer.appendChild(tempAutoFloorMatchSelect);
+    
+    
+    // Add sidebar, then floor image
+    tempFloorContainer.appendChild(tempAutoFloorSidebarContainer);
     tempFloorContainer.appendChild(tempFloorImageContainer);
 
 
