@@ -1327,6 +1327,7 @@ async function openTeamBreakdowns() {
     lowerNoteContainer.style.marginLeft = "5%";
     tempFloorImageContainer.appendChild(lowerNoteContainer);
 
+    let tempTempNotes = [];
     // Add notes to upper container
     for(let i = 0; i < 5; i ++) {
         let tempNote = document.createElement("div");
@@ -1334,6 +1335,8 @@ async function openTeamBreakdowns() {
         tempNote.id = i;
 
         upperNoteContainer.appendChild(tempNote);
+
+        tempTempNotes.push(tempNote);
     }
     
     // If the field is red, alter styling to mirror
@@ -1352,14 +1355,16 @@ async function openTeamBreakdowns() {
 
         lowerNoteContainer.appendChild(tempNote);
 
+        tempTempNotes.push(tempNote);
     }
 
     // Initial floor notes
-    let tempTempNotes = document.getElementsByClassName("breakdown-floor-note");
+    tempTeamAutoPickups = tempTeamAutoPickups[0].split(",");
     for(let i = 0; i < tempTeamAutoPickups.length; i ++) {
         if(tempTeamAutoPickups[i] == null) {
             break;
         }
+        console.log(tempTempNotes);
         tempTempNotes[parseInt(tempTeamAutoPickups[i])%8].style.backgroundColor = parseInt(tempTeamAutoPickups[i]) > 7 ? "rgba(255, 0, 0, 0.4)" : "rgba(0, 255, 0, 0.4)";
     }
 
