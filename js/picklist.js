@@ -1,4 +1,4 @@
-const scriptPickListURL = "https://script.google.com/macros/s/AKfycbxpG_KDd0WtiQEjHKmSfUsTYCe1RvOYxp3wYv83hCpWYNRbk7F6WHLl2JoPgvcxQVqB/exec";
+const scriptPickListURL = "https://script.google.com/macros/s/AKfycbxq0efVb28TNP_VLH5ZidrDkPeGkpBuqMFZZweMMpIBekbka9qH_rGn0QETObvnFAFb/exec";
 const pickListSync = document.getElementById("sync-pick-list-button");
 const pickListForm = document.getElementById("pick-list-form");
 
