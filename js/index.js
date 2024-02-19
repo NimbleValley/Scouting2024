@@ -2118,7 +2118,7 @@ function getTeamData() {
             dataType = new String(RECORDS[0][i]).substring(0, 1);
         }
         // Special case is match number, that would obviously be useless to round & use haha
-        if (detectCharacter(dataType) == 1 && FIELDS[i] != "Match Number") {
+        if (((detectCharacter(dataType) == 1) || (FIELDS[i] == "Tele Speaker %" || FIELDS[i] == "Auto Speaker %")) && FIELDS[i] != "Match Number" && FIELDS[i] != "Auto Piece Selection") {
             dataToKeep.push(i - 1);
             TEAM_FIELDS.push(FIELDS[i]);
         }
@@ -2252,10 +2252,12 @@ function getTeamData() {
         TEAM_ROWS[i][13] = Math.round(teleSpeakerTotalMade / teleSpeakerTotal * 1000) / 10;
 
         TEAM_COLUMNS[7][i] = Math.round(autoSpeakerTotalMade / autoSpeakerTotal * 1000) / 10;
-        TEAM_COLUMNS[13][i] = Math.round(teleSpeakerTotalMade / teleSpeakerTotal * 1000) / 10;
+        TEAM_COLUMNS[12][i] = Math.round(teleSpeakerTotalMade / teleSpeakerTotal * 1000) / 10;
+        
+        console.log(dataToKeep.length);
 
         tempCols[7].children[i + 1].innerText = TEAM_COLUMNS[7][i];
-        tempCols[13].children[i + 1].innerText = TEAM_COLUMNS[13][i];
+        tempCols[12].children[i + 1].innerText = TEAM_COLUMNS[12][i];
 
         // Add comment text to correct position
         TEAM_ROWS[i].push(tempComment);
