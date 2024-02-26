@@ -197,6 +197,9 @@ getEventListTBA(`https://www.thebluealliance.com/api/v3/events/${Year}`);
 
 
 
+var intervalID;
+
+
 // Sets up the buttons in side bar, callback
 function setUpSideButtonEvents() {
     for (var i = 1; i < sideButtons.length - 1; i++) {
@@ -211,6 +214,10 @@ function setUpSideButtonEvents() {
 
 // Removes orange highlight from side buttons
 function removeActive() {
+    clearInterval(intervalID);
+    console.log("Removed interval");
+    intervalID = null;
+
     for (let i = 0; i < sideButtons.length; i++) {
         sideButtons[i].classList = "side-button";
     }
@@ -1208,21 +1215,20 @@ async function openTeamBreakdowns() {
     // Auto speaker
     let tempAutoSpeakerTotal = 0;
     let tempAutoSpeakerMade = 0;
-    for (let i = 0; i < tempTeamRows.length; i++) {
-        tempAutoSpeakerTotal += parseInt(tempTeamRows[i][16] + tempTeamRows[i][17]);
-        tempAutoSpeakerMade += parseInt(tempTeamRows[i][16]);
-        tempTeamMatches.push(parseInt(tempTeamRows[i][2]));
-        tempTeamAutoPickups.push(tempTeamRows[i][14]);
-    }
-    tempPercentGraphContainer.appendChild(getBreakdownPercentPie("Auto Speaker", tempAutoSpeakerTotal, tempAutoSpeakerMade));
 
     // Tele speaker
     let tempTeleSpeakerTotal = 0;
     let tempTeleSpeakerMade = 0;
     for (let i = 0; i < tempTeamRows.length; i++) {
-        tempTeleSpeakerTotal += parseInt(tempTeamRows[i][8] + tempTeamRows[i][9]);
-        tempTeleSpeakerMade += parseInt(tempTeamRows[i][8]);
+        tempAutoSpeakerTotal += parseInt(tempTeamRows[i][8] + tempTeamRows[i][9]);
+        tempAutoSpeakerMade += parseInt(tempTeamRows[i][8]);
+        tempTeamMatches.push(parseInt(tempTeamRows[i][2]));
+        tempTeamAutoPickups.push(tempTeamRows[i][14]);
+
+        tempTeleSpeakerTotal += parseInt(tempTeamRows[i][16] + tempTeamRows[i][17]);
+        tempTeleSpeakerMade += parseInt(tempTeamRows[i][16]);
     }
+    tempPercentGraphContainer.appendChild(getBreakdownPercentPie("Auto Speaker", tempAutoSpeakerTotal, tempAutoSpeakerMade));
     tempPercentGraphContainer.appendChild(getBreakdownPercentPie("Tele Speaker", tempTeleSpeakerTotal, tempTeleSpeakerMade));
 
     let tempTrapTotal = 0;
@@ -1231,7 +1237,7 @@ async function openTeamBreakdowns() {
         if (tempTeamRows[i][22] == "Successful") {
             tempTrapTotal++;
             tempTrapMade++;
-        } else if(tempTeamRows[i][22] == "Failed") {
+        } else if (tempTeamRows[i][22] == "Failed") {
             tempTrapTotal++;
         }
     }
@@ -1243,7 +1249,7 @@ async function openTeamBreakdowns() {
         if (tempTeamRows[i][21] == "Successful") {
             tempClimbTotal++;
             tempClimbMade++;
-        } else if(tempTeamRows[i][21] == "Failed") {
+        } else if (tempTeamRows[i][21] == "Failed") {
             tempClimbTotal++;
         }
     }
@@ -1313,7 +1319,7 @@ async function openTeamBreakdowns() {
     // Background image & notes
     let tempFloorImageContainer = document.createElement("div");
     tempFloorImageContainer.id = "floor-image-container";
-    tempFloorImageContainer.style.backgroundImage = `url(img/${tempTeamRows[0][1].substring(0,1) == "B" ? "blue" : "red"}field24.jpg)`;
+    tempFloorImageContainer.style.backgroundImage = `url(img/${tempTeamRows[0][1].substring(0, 1) == "B" ? "blue" : "red"}field24.jpg)`;
 
     // Add notes in, two containers, one with 3 & one with 5
     let upperNoteContainer = document.createElement("div");
@@ -1329,7 +1335,7 @@ async function openTeamBreakdowns() {
 
     let tempTempNotes = [];
     // Add notes to upper container
-    for(let i = 0; i < 5; i ++) {
+    for (let i = 0; i < 5; i++) {
         let tempNote = document.createElement("div");
         tempNote.className = "breakdown-floor-note";
         tempNote.id = i;
@@ -1338,71 +1344,91 @@ async function openTeamBreakdowns() {
 
         tempTempNotes.push(tempNote);
     }
-    
+
     // If the field is red, alter styling to mirror
-    if(tempTeamRows[0][1].substring(0,1) == "R") {
+    if (tempTeamRows[0][1].substring(0, 1) == "R") {
         upperNoteContainer.style.scale = -1;
         lowerNoteContainer.style.scale = -1;
         lowerNoteContainer.style.marginLeft = "40%";
     }
-    
+
     // Add notes to lower container
-    for(let i = 0; i < 3; i ++) {
+    for (let i = 0; i < 3; i++) {
         let tempNote = document.createElement("div");
         tempNote.className = "breakdown-floor-note";
 
-        tempNote.id = i+5;
+        tempNote.id = i + 5;
 
         lowerNoteContainer.appendChild(tempNote);
 
         tempTempNotes.push(tempNote);
     }
 
+    console.log(tempTeamAutoPickups);
     // Initial floor notes
-    tempTeamAutoPickups = tempTeamAutoPickups[0].split(",");
-    for(let i = 0; i < tempTeamAutoPickups.length; i ++) {
-        if(tempTeamAutoPickups[i] == null) {
+    let initialAutoNotes = [];
+
+    if (tempTeamAutoPickups[0] != null) {
+        initialAutoNotes = String(tempTeamAutoPickups[0]).split(",");
+    }
+
+    for (let i = 0; i < initialAutoNotes.length; i++) {
+        if (initialAutoNotes[i] == null) {
             break;
         }
         console.log(tempTempNotes);
-        tempTempNotes[parseInt(tempTeamAutoPickups[i])%8].style.backgroundColor = parseInt(tempTeamAutoPickups[i]) > 7 ? "rgba(255, 0, 0, 0.4)" : "rgba(0, 255, 0, 0.4)";
+        tempTempNotes[parseInt(initialAutoNotes[i]) % 8].style.backgroundColor = parseInt(initialAutoNotes[i]) > 7 ? "rgba(255, 0, 0, 0.4)" : "rgba(0, 255, 0, 0.4)";
     }
 
     // Create sidebar
     let tempAutoFloorSidebarContainer = document.createElement("div");
     tempAutoFloorSidebarContainer.id = "auto-floor-sidebar-container";
-    
+
     // Sidebar select for match numbers
     let tempAutoFloorMatchSelect = document.createElement("select");
     tempAutoFloorMatchSelect.style.width = "20vh";
-    for(let i = 0; i < tempTeamMatches.length; i ++) {
+    for (let i = 0; i < tempTeamMatches.length; i++) {
         let tempOption = document.createElement("option");
-        tempOption.value = String(tempTeamAutoPickups[i]);
+        tempOption.value = [tempTeamRows[i][1].substring(0, 1), String(tempTeamAutoPickups[i])];
         tempOption.innerText = tempTeamMatches[i];
         tempAutoFloorMatchSelect.appendChild(tempOption);
     }
 
-    tempAutoFloorMatchSelect.addEventListener("change", function() {
+    tempAutoFloorMatchSelect.addEventListener("change", function () {
         let tempNoteLocations = document.getElementsByClassName("breakdown-floor-note");
 
-        for(let i = 0; i < tempNoteLocations.length; i ++) {
+        for (let i = 0; i < tempNoteLocations.length; i++) {
             tempNoteLocations[i].style.backgroundColor = "transparent";
         }
 
         let tempLocationsArray = this.value.split(',');
         console.log(tempLocationsArray);
 
-        for(let i = 0; i < tempLocationsArray.length; i ++) {
-            if(tempLocationsArray[i] == "null") {
+        let alliance = tempLocationsArray.splice(0, 1);
+
+        if (alliance == "R") {
+            upperNoteContainer.style.scale = -1;
+            lowerNoteContainer.style.scale = -1;
+            lowerNoteContainer.style.marginLeft = "40%";
+        } else {
+            upperNoteContainer.style.scale = 1;
+            lowerNoteContainer.style.scale = 1;
+            lowerNoteContainer.style.marginLeft = "5%";
+        }
+
+        tempFloorImageContainer.style.backgroundImage = `url(img/${alliance == "B" ? "blue" : "red"}field24.jpg)`;
+
+        for (let i = 0; i < tempLocationsArray.length; i++) {
+            if (tempLocationsArray[i] == "null" || tempLocationsArray[i] == "undefined") {
                 break;
             }
-            tempNoteLocations[parseInt(tempLocationsArray[i])%8].style.backgroundColor = parseInt(tempLocationsArray[i]) > 7 ? "rgba(255, 0, 0, 0.4)" : "rgba(0, 255, 0, 0.4)";
+            tempNoteLocations[parseInt(tempLocationsArray[i]) % 8].style.backgroundColor = parseInt(tempLocationsArray[i]) > 7 ? "rgba(255, 0, 0, 0.4)" : "rgba(0, 255, 0, 0.4)";
         }
     });
 
     tempAutoFloorSidebarContainer.appendChild(tempAutoFloorMatchSelect);
-    
-    
+
+
     // Add sidebar, then floor image
     tempFloorContainer.appendChild(tempAutoFloorSidebarContainer);
     tempFloorContainer.appendChild(tempFloorImageContainer);
@@ -1423,21 +1449,21 @@ async function openTeamBreakdowns() {
 
     //let commentText = "Comments: ";
     for (var i = 0; i < tempTeamRows.length; i++) {
-            let tempComment = document.createElement("h1");
-            tempComment.className = "breakdown-comment";
-            tempComment.innerHTML = `<span style='color: rgb(255, 221, 109)'>Qual ${tempTeamRows[i][2]}:</span> ${tempTeamRows[i][7]}`;
-            tempCommentContainer.appendChild(tempComment);
+        let tempComment = document.createElement("h1");
+        tempComment.className = "breakdown-comment";
+        tempComment.innerHTML = `<span style='color: rgb(255, 221, 109)'>Qual ${tempTeamRows[i][2]}:</span> ${tempTeamRows[i][7]}`;
+        tempCommentContainer.appendChild(tempComment);
 
-            speakerRanges.push(tempTeamRows[i][26]);
-            intakeMethods.push(tempTeamRows[i][27]);
+        speakerRanges.push(tempTeamRows[i][26]);
+        intakeMethods.push(tempTeamRows[i][27]);
 
-            if (tempTeamRows[i][24] != "N/A") {
-                climbSpeeds.push(tempTeamRows[i][24]);
-            }
+        if (tempTeamRows[i][24] != "N/A") {
+            climbSpeeds.push(tempTeamRows[i][24]);
+        }
 
-            if (tempTeamRows[i][22] == "Successful") {
-                trapCounter++;
-            }
+        if (tempTeamRows[i][22] == "Successful") {
+            trapCounter++;
+        }
     }
 
     let teamFeatureContainer = document.createElement("div");
@@ -1735,7 +1761,7 @@ function refreshData() {
     getData();
 }
 
-function setUpPickList() {
+async function setUpPickList() {
     getTeamData();
 
     breakdownLines.style.display = "none";
@@ -1755,25 +1781,25 @@ function setUpPickList() {
 
         tempTeam.appendChild(tempTeamText);
 
-        if (TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][13] < 65) {
+        if (TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][12] < 65) {
             let tempWarning = document.createElement("div");
             tempWarning.className = "warning-container";
             let tempWarningText = document.createElement("div");
             tempWarningText.className = "warning-popup";
             tempWarning.appendChild(tempWarningText);
             tempWarning.style.backgroundImage = "url('svg/target-bad.svg')";
-            tempWarningText.innerText = "Tele Speaker Accuracy " + TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][13] + "%";
+            tempWarningText.innerText = "Tele Speaker Accuracy " + TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][12] + "%";
             tempTeam.appendChild(tempWarning);
         }
 
-        if (TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][13] > 80) {
+        if (TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][12] > 80) {
             let tempWarning = document.createElement("div");
             tempWarning.className = "warning-container";
             let tempWarningText = document.createElement("div");
             tempWarningText.className = "warning-popup";
             tempWarning.appendChild(tempWarningText);
             tempWarning.style.backgroundImage = "url('svg/target-good.svg')";
-            tempWarningText.innerText = "Tele Speaker Accuracy " + TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][13] + "%";
+            tempWarningText.innerText = "Tele Speaker Accuracy " + TEAM_ROWS[TEAMS.indexOf(PICK_LIST_OBJECTS[i].getTeam())][12] + "%";
             tempTeam.appendChild(tempWarning);
         }
 
@@ -1892,10 +1918,15 @@ function setUpPickList() {
         tempTelePoints.className = "pick-list-team-stat";
         tempTeam.appendChild(tempTelePoints);
 
-        let tempPoints = document.createElement("div");
-        tempPoints.innerText = TEAM_ROWS[TEAM_COLUMNS[0].indexOf(PICK_LIST_OBJECTS[i].getTeam())][13];
-        tempPoints.className = "pick-list-team-stat";
-        tempTeam.appendChild(tempPoints);
+        let tempEndgamePoints = document.createElement("div");
+        tempEndgamePoints.innerText = TEAM_ROWS[TEAM_COLUMNS[0].indexOf(PICK_LIST_OBJECTS[i].getTeam())][3];
+        tempEndgamePoints.className = "pick-list-team-stat";
+        tempTeam.appendChild(tempEndgamePoints);
+
+        let tempTotalPoints = document.createElement("div");
+        tempTotalPoints.innerText = TEAM_ROWS[TEAM_COLUMNS[0].indexOf(PICK_LIST_OBJECTS[i].getTeam())][4];
+        tempTotalPoints.className = "pick-list-team-stat";
+        tempTeam.appendChild(tempTotalPoints);
 
         var tempControlPanel = document.createElement("div");
         tempControlPanel.className = "pick-list-control-panel";
@@ -2027,6 +2058,15 @@ function setUpPickList() {
         }
 
         innerPickListContainer.appendChild(tempTeam);
+    }
+
+    await sleep(250);
+
+    let userInterval = parseInt(document.getElementById("auto-download-input").value) * 1000;
+
+    if (!intervalID) {
+        intervalID = setInterval(downloadPickList, userInterval > 10000 ? userInterval : 120000);
+        console.log("Set interval");
     }
 }
 
@@ -2230,7 +2270,7 @@ function getTeamData() {
         for (let q = 0; q < RECORDS.length; q++) {
             // Find all comments for current team, add to variable
             if (RECORDS[q][TEAM_INDEX] == TEAMS[i]) {
-                tempComment += RECORDS[q][FIELDS.indexOf("Comments")] + "\n";
+                tempComment += "Q" + RECORDS[q][2] + ":   " + RECORDS[q][FIELDS.indexOf("Comments")] + "\n\n";
 
                 // Adds to auto & tele speaker totals, for percents
                 autoSpeakerTotal += parseInt(RECORDS[q][8]) + parseInt(RECORDS[q][9]);
@@ -2249,11 +2289,11 @@ function getTeamData() {
         }
 
         TEAM_ROWS[i][7] = Math.round(autoSpeakerTotalMade / autoSpeakerTotal * 1000) / 10;
-        TEAM_ROWS[i][13] = Math.round(teleSpeakerTotalMade / teleSpeakerTotal * 1000) / 10;
+        TEAM_ROWS[i][12] = Math.round(teleSpeakerTotalMade / teleSpeakerTotal * 1000) / 10;
 
         TEAM_COLUMNS[7][i] = Math.round(autoSpeakerTotalMade / autoSpeakerTotal * 1000) / 10;
         TEAM_COLUMNS[12][i] = Math.round(teleSpeakerTotalMade / teleSpeakerTotal * 1000) / 10;
-        
+
         console.log(dataToKeep.length);
 
         tempCols[7].children[i + 1].innerText = TEAM_COLUMNS[7][i];
@@ -2318,7 +2358,7 @@ function getTeamMatchesTBA(url) {
             for (let i = 0; i < json.length; i++) {
                 let tempMatchText = document.createElement("a");
                 tempMatchText.className = "breakdown-comment";
-                tempMatchText.text = "Qual " + json[i].match_number;
+                tempMatchText.text = json[i].comp_level.toUpperCase() + " " + json[i].match_number;
                 if (json[i].videos.length > 0) {
                     tempMatchText.href = `https://www.youtube.com/watch?v=${json[i].videos[0].key}`;
                 } else {
@@ -2388,4 +2428,9 @@ function pickListSliderCallback() {
         warnings[i].style.height = pickListScaleSlider.value + "vh";
         warnings[i].style.width = pickListScaleSlider.value + "vh";
     }
+}
+
+// Sleep command for functions
+const sleep = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
 }

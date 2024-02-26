@@ -261,7 +261,7 @@ h3 {
 .pick-list-sort-button {
     font-size: 2.5vw;
     width: fit-content;
-    border: 0.5vh solid white;
+    border: 0.5vh solid rgb(170, 170, 170);
     padding: 0vh 1vh 0vh 1vh;
     border-radius: 0.5vh;
     transition: color 0.25s, background-color 0.25s;
@@ -269,7 +269,7 @@ h3 {
 
 .pick-list-sort-button:hover {
     cursor: pointer;
-    background-color: white;
+    background-color: rgb(173, 166, 151);
     color: black;
 }
 
@@ -299,7 +299,6 @@ h3 {
 
 .warning-container:hover>.warning-popup {
     display: block;
-    filter: brightness(0.8);
 }
 
 .warning-popup {
@@ -313,6 +312,7 @@ h3 {
     background-color: #333333;
     padding: 0.25vh;
     border-radius: 0.25vh;
+    filter: brightness(0.7);
 }
 
 .pick-list-team-stat {
@@ -698,7 +698,7 @@ p {
 .setting-label {
     color: white;
     font-size: 3vh;
-    margin-bottom: 1.5vh;
+    padding-bottom: 0.75vh;
 }
 
 .vertical-container {
@@ -1461,6 +1461,18 @@ h6 {
     color: white !important;
 }
 
+
+
+
+#horizontal-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+#auto-download-input {
+    width: 15vh;
+}
 
 
 
