@@ -7,6 +7,21 @@ var tl = new TimelineMax();
 
 const body = document.body;
 
+// TODO CHANGE THIS PLEASE PLEASE PLEASE PLEASE PLEASE ON FRIDAY NIGHT PLEASE PLEASE PLEASE
+const TEAM_MATCH_DATA = [
+    {
+        "Match": 13,
+        "Red": [3197, 2202, 6421],
+        "Blue": [1714, 93, 4786]
+    },
+    {
+        "Match": 27,
+        "Red": [1732, 1675, 1259],
+        "Blue": [6574, 3197, 5148]
+    }
+]
+
+let badCompareValues = [5, 8, 10, 13];
 
 // Sidebar variables, self explanatory
 const sidebar = document.getElementById("sidebar");
@@ -34,7 +49,7 @@ const breakdownGrid = document.getElementById("breakdown-grid");
 
 // FIXME important these match up, probably could improve
 const breakdownCategoryHeaders = ["Total Points", "Auto Points", "Tele Points", "Endgame points", "Tele Amp", "Tele Speaker"];
-const sortIndexes = [4, 1, 2, 3, 14, 11];
+const sortIndexes = [4, 1, 2, 3, 14, 10];
 
 var firstbreakdown = true;
 
@@ -105,7 +120,7 @@ highlightSelect.addEventListener('change', function () {
 
 highlightSelect.value = highlightTeamData;
 
-const warningTypes = ["Flip/s", "Comm Issue/s", "Disabled", "Unintelligent", "Reckless"];
+const warningTypes = ["Too Tall/s", "Comm Issue/s", "Disabled", "Unintelligent", "Reckless"];
 
 
 // TODO document this section
@@ -394,7 +409,7 @@ function resetRaw() {
     for (let i = 0; i < RECORDS.length; i++) {
         for (let s = 0; s < RECORDS[i].length; s++) {
             // Updates teams flipped, comms, etc.
-            if (FIELDS[s] == "Flip") {
+            if (FIELDS[s] == "Too Tall") {
                 if (RECORDS[i][s] == "Yes") {
                     TEAMS_FLIPPED.push(RECORDS[i][TEAM_INDEX]);
                 }
@@ -669,20 +684,39 @@ function doCompare(teamSelects, statContainers) {
             if (width >= 95) {
                 width = 95;
             }
-            if (width > 50) {
-                tempLine.style.zIndex = 10;
-                tempNumbers[l].style.backgroundColor = `rgba(50, 205, 50, ${(width - 50) / 50})`;
-                tempNumbers[l].style.border = "solid 0.5vh limegreen";
-                tempNumbers[l].style.fontWeight = "bold";
-                tempNumbers[l].style.textShadow = "lime 0px 0px 0.75vh";
-                //tempLine.classList.add(`compare-pulse-${l}`);
+            console.log(badCompareValues.includes(i) + ", " + i + ", " + teamStats[l]);
+            if (badCompareValues.includes(i)) {
+                if (width > 50) {
+                    tempLine.style.zIndex = 0;
+                    tempNumbers[l].style.backgroundColor = "transparent";
+                    tempNumbers[l].style.fontWeight = "normal";
+                    tempNumbers[l].style.textShadow = "none";
+                    tempLine.classList = "compare-inner-line";
+                    tempNumbers[l].style.border = "solid 0.5vh transparent";
+                    //tempLine.classList.add(`compare-pulse-${l}`);
+                } else {
+                    tempLine.style.zIndex = 10;
+                    tempNumbers[l].style.backgroundColor = `rgba(50, 205, 50, ${(width - 50) / 50})`;
+                    tempNumbers[l].style.border = "solid 0.5vh limegreen";
+                    tempNumbers[l].style.fontWeight = "bold";
+                    tempNumbers[l].style.textShadow = "lime 0px 0px 0.75vh";
+                }
             } else {
-                tempLine.style.zIndex = 0;
-                tempNumbers[l].style.backgroundColor = "transparent";
-                tempNumbers[l].style.fontWeight = "normal";
-                tempNumbers[l].style.textShadow = "none";
-                tempLine.classList = "compare-inner-line";
-                tempNumbers[l].style.border = "solid 0.5vh transparent";
+                if (width > 50) {
+                    tempLine.style.zIndex = 10;
+                    tempNumbers[l].style.backgroundColor = `rgba(50, 205, 50, ${(width - 50) / 50})`;
+                    tempNumbers[l].style.border = "solid 0.5vh limegreen";
+                    tempNumbers[l].style.fontWeight = "bold";
+                    tempNumbers[l].style.textShadow = "lime 0px 0px 0.75vh";
+                    //tempLine.classList.add(`compare-pulse-${l}`);
+                } else {
+                    tempLine.style.zIndex = 0;
+                    tempNumbers[l].style.backgroundColor = "transparent";
+                    tempNumbers[l].style.fontWeight = "normal";
+                    tempNumbers[l].style.textShadow = "none";
+                    tempLine.classList = "compare-inner-line";
+                    tempNumbers[l].style.border = "solid 0.5vh transparent";
+                }
             }
             if (teamStats[0] == teamStats[1]) {
                 console.log(width);
@@ -703,6 +737,8 @@ function doCompare(teamSelects, statContainers) {
 }
 
 function setUpMatches() {
+    getTeamData();
+
     rawTable.innerHTML = "";
     graphContainer.style.display = "none";
     pickListContainer.style.display = "none";
@@ -714,18 +750,10 @@ function setUpMatches() {
     matchSelect.id = "match-select";
     matchSelect.addEventListener("change", doMatch);
 
-    for (var i = 0; i < RECORDS.length; i++) {
-        if (!matches.includes(RECORDS[i][2])) {
-            matches.push(parseInt(RECORDS[i][2]));
-        }
-    }
-
-    matches.sort(function (a, b) { return a - b });
-
-    for (var i = 0; i < matches.length; i++) {
+    for (var i = 0; i < TEAM_MATCH_DATA.length; i++) {
         let tempOption = document.createElement("option");
-        tempOption.value = String(matches[i]);
-        tempOption.text = matches[i];
+        tempOption.value = i;
+        tempOption.text = TEAM_MATCH_DATA[i].Match;
         matchSelect.appendChild(tempOption);
     }
 
@@ -746,6 +774,125 @@ function doMatch() {
     let matchSelect = document.getElementById("match-select");
 
     localStorage.setItem("match-number", matchSelect.value);
+
+    let matchNumber = parseInt(matchSelect.value);
+
+    let matchField = document.getElementById("match-field");
+    matchField.innerHTML = "";
+
+
+
+    // BLUE SECTION
+    let blueContainer = document.createElement("div");
+    blueContainer.id = "blue-match-container";
+
+    let blueColumns = [];
+
+    for (let i = 0; i < 6; i++) {
+        let tempColumn = document.createElement("div");
+        tempColumn.className = "match-column"
+        blueColumns.push(tempColumn);
+        blueContainer.appendChild(tempColumn);
+    }
+    blueColumns[0].appendChild(createMatchCell(true, "Categories", true));
+    for (let i = 0; i < 3; i++) {
+        blueColumns[0].appendChild(createMatchCell(true, TEAM_MATCH_DATA[matchNumber].Blue[i], true));
+    }
+    blueColumns[0].appendChild(createMatchCell(true, "Totals", true));
+
+    blueColumns[1].appendChild(createMatchCell(true, "AutoPoints", true));
+    blueColumns[2].appendChild(createMatchCell(true, "TelePoints", true));
+    blueColumns[3].appendChild(createMatchCell(true, "EndgamePoints", true));
+    blueColumns[4].appendChild(createMatchCell(true, "TotalPoints", true));
+    blueColumns[5].appendChild(createMatchCell(true, "Gamepieces", true));
+
+    let dataIndicies = [1, 2, 3, 4, -1];
+    let blueTotals = [];
+
+    for (let i = 0; i < dataIndicies.length; i++) {
+        blueTotals.push(0);
+        for (let t = 0; t < 3; t++) {
+            let tempValue = 0;
+            if (dataIndicies[i] != -1) {
+                tempValue = TEAM_COLUMNS[dataIndicies[i]][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Blue[t]))];
+            } else {
+                tempValue = TEAM_COLUMNS[5][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Blue[t]))] + TEAM_COLUMNS[8][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Blue[t]))] + TEAM_COLUMNS[10][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Blue[t]))] + TEAM_COLUMNS[13][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Blue[t]))];
+            }
+            tempValue = Math.round(tempValue * 10) / 10;
+            blueTotals[i] += tempValue;
+            blueColumns[i + 1].appendChild(createMatchCell(true, tempValue, false));
+        }
+    }
+
+    for (let i = 0; i < blueTotals.length; i++) {
+        blueColumns[i + 1].appendChild(createMatchCell(true, blueTotals[i], true));
+    }
+
+    matchField.appendChild(blueContainer);
+
+
+
+    // RED SECTION
+    let redContainer = document.createElement("div");
+    redContainer.id = "red-match-container";
+
+    let redColumns = [];
+
+    for (let i = 0; i < 6; i++) {
+        let tempColumn = document.createElement("div");
+        tempColumn.className = "match-column"
+        redColumns.push(tempColumn);
+        redContainer.appendChild(tempColumn);
+    }
+    redColumns[0].appendChild(createMatchCell(false, "Categories", true));
+    for (let i = 0; i < 3; i++) {
+        redColumns[0].appendChild(createMatchCell(false, TEAM_MATCH_DATA[matchNumber].Red[i], true));
+    }
+    redColumns[0].appendChild(createMatchCell(false, "Totals", true));
+
+    redColumns[1].appendChild(createMatchCell(false, "AutoPoints", true));
+    redColumns[2].appendChild(createMatchCell(false, "TelePoints", true));
+    redColumns[3].appendChild(createMatchCell(false, "EndgamePoints", true));
+    redColumns[4].appendChild(createMatchCell(false, "TotalPoints", true));
+    redColumns[5].appendChild(createMatchCell(false, "Gamepieces", true));
+
+    let redTotals = [];
+
+    for (let i = 0; i < dataIndicies.length; i++) {
+        redTotals.push(0);
+        for (let t = 0; t < 3; t++) {
+            let tempValue = 0;
+            if (dataIndicies[i] != -1) {
+                tempValue = TEAM_COLUMNS[dataIndicies[i]][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Red[t]))];
+            } else {
+                tempValue = TEAM_COLUMNS[5][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Red[t]))] + TEAM_COLUMNS[8][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Red[t]))] + TEAM_COLUMNS[10][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Red[t]))] + TEAM_COLUMNS[13][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Red[t]))];
+            }
+            tempValue = Math.round(tempValue * 10) / 10;
+            redTotals[i] += tempValue;
+            redColumns[i + 1].appendChild(createMatchCell(false, tempValue, false));
+        }
+    }
+
+    for (let i = 0; i < redTotals.length; i++) {
+        redColumns[i + 1].appendChild(createMatchCell(false, redTotals[i], true));
+    }
+
+    matchField.appendChild(redContainer);
+}
+
+function createMatchCell(blue, text, bold) {
+    let tempCell = document.createElement("div");
+    tempCell.innerText = text;
+    tempCell.className = "match-data-cell";
+    if (bold) {
+        tempCell.style.fontWeight = "bold";
+    }
+    if (blue) {
+        tempCell.id = "blue-match-data-cell";
+        return tempCell;
+    }
+    tempCell.id = "red-match-data-cell";
+    return tempCell;
 }
 
 function setUpGraph() {
@@ -1809,18 +1956,14 @@ async function setUpPickList() {
             let tempWarningText = document.createElement("div");
             tempWarningText.className = "warning-popup";
             tempWarning.appendChild(tempWarningText);
-            tempWarning.style.backgroundImage = "url('svg/flip.svg')";
+            tempWarning.style.backgroundImage = "url('svg/too-tall.svg')";
             let counter = 0;
             for (let x = 0; x < TEAMS_FLIPPED.length; x++) {
                 if (TEAMS_FLIPPED[x] == PICK_LIST_OBJECTS[i].getTeam()) {
                     counter++;
                 }
             }
-            if (counter == 1) {
-                tempWarningText.innerText = counter + " Flip";
-            } else {
-                tempWarningText.innerText = counter + " Flips";
-            }
+            tempWarningText.innerText = "Too tall to go under stage";
             tempTeam.appendChild(tempWarning);
         }
 
@@ -2065,9 +2208,13 @@ async function setUpPickList() {
     let userInterval = parseInt(document.getElementById("auto-download-input").value) * 1000;
 
     if (!intervalID) {
-        intervalID = setInterval(downloadPickList, userInterval > 10000 ? userInterval : 120000);
+        intervalID = setInterval(dowlocalStoragePickListnloadPickList, userInterval > 10000 ? userInterval : 120000);
         console.log("Set interval");
     }
+}
+
+function localStoragePickList() {
+
 }
 
 function downloadPickList() {
@@ -2433,4 +2580,155 @@ function pickListSliderCallback() {
 // Sleep command for functions
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+function setUpCategories() {
+    getTeamData();
+
+    let categoryContainer = document.createElement("div");
+    categoryContainer.id = "category-container";
+
+    rawTable.innerHTML = "";
+
+    let tempTeamSelect = document.createElement("select");
+    tempTeamSelect.className = "compare-team-select";
+    tempTeamSelect.id = "category-team-select";
+
+    let anyOption = document.createElement("option");
+    anyOption.value = "Any";
+    anyOption.innerText = "Any";
+    tempTeamSelect.appendChild(anyOption);
+
+    let tempSelectContainer = document.createElement("div");
+
+    for (let t = 0; t < TEAMS.length; t++) {
+        let tempOption = document.createElement("option");
+        tempOption.value = String(TEAMS[t]);
+        tempOption.innerText = TEAMS[t];
+        tempTeamSelect.appendChild(tempOption);
+    }
+    tempTeamSelect.value = "Any";
+    tempSelectContainer.appendChild(tempTeamSelect);
+
+
+
+    let tempCategorySelect = document.createElement("select");
+    tempCategorySelect.className = "compare-team-select";
+    tempCategorySelect.id = "category-category-select";
+
+    tempTeamSelect.addEventListener('change', runCategories);
+    tempCategorySelect.addEventListener('change', runCategories);
+
+    console.log(TEAM_FIELDS)
+
+    for (let t = 1; t < TEAM_FIELDS.length; t++) {
+        let tempOption = document.createElement("option");
+        tempOption.value = String(t);
+        tempOption.innerText = TEAM_FIELDS[t];
+        tempCategorySelect.appendChild(tempOption);
+    }
+    tempSelectContainer.appendChild(tempCategorySelect);
+
+    categoryContainer.appendChild(tempSelectContainer);
+    rawTable.appendChild(categoryContainer);
+
+    if (localStorage.getItem("category") != null) {
+        tempCategorySelect.value = localStorage.getItem("category");
+    }
+
+    runCategories();
+}
+
+function runCategories() {
+    let categoryContainer = document.getElementById("category-container");
+
+    if (categoryContainer.children.length > 1) {
+        for (let i = 0; i < 1; i++) {
+            categoryContainer.removeChild(categoryContainer.lastChild);
+        }
+    }
+
+    let columnNumber = parseInt(document.getElementById("category-category-select").value);
+
+    localStorage.setItem("category", document.getElementById("category-category-select").value);
+
+    let tempColumns = [];
+    for (let i = 0; i < 3; i++) {
+        let tempColumn = document.createElement("div");
+        tempColumn.className = "column";
+        tempColumn.style.marginRight = "2.5vh";
+        tempColumns.push(tempColumn);
+    }
+
+    let valuesSorted = JSON.parse(JSON.stringify(TEAM_COLUMNS[columnNumber]));
+    valuesSorted = valuesSorted.sort(function (a, b) { return b - a });
+
+    let teams = [];
+
+    let tempTeamColumn = JSON.parse(JSON.stringify(TEAM_COLUMNS[columnNumber]));
+    let tempTeams = JSON.parse(JSON.stringify(TEAMS));
+
+    for (let i = 0; i < TEAMS.length; i++) {
+        let index = tempTeamColumn.indexOf(valuesSorted[i]);
+        teams.push(tempTeams[index]);
+
+        tempTeamColumn.splice(index, 1);
+        tempTeams.splice(index, 1);
+    }
+
+    let tableContainer = document.createElement("div");
+    tableContainer.id = "category-table-container";
+
+    for (let i = 0; i < TEAM_COLUMNS[columnNumber].length; i++) {
+        let tempPlace = document.createElement("div");
+        tempPlace.innerText = i + 1;
+        tempPlace.className = "category-data-value";
+        tempColumns[0].appendChild(tempPlace);
+
+        let tempTeam = document.createElement("div");
+        tempTeam.innerText = teams[i];
+        tempTeam.className = "category-data-value";
+        tempColumns[1].appendChild(tempTeam);
+
+        let tempValue = document.createElement("div");
+        tempValue.innerText = valuesSorted[i];
+        tempValue.className = "category-data-value";
+        tempColumns[2].appendChild(tempValue);
+
+        if (i % 3 == 1) {
+            tempPlace.style.backgroundColor = "#302f2b";
+            tempTeam.style.backgroundColor = "#302f2b";
+            tempValue.style.backgroundColor = "#302f2b";
+        }
+    }
+
+    for (let c = 0; c < tempColumns.length; c++) {
+        tableContainer.appendChild(tempColumns[c]);
+    }
+
+    categoryContainer.appendChild(tableContainer);
+
+    highlightCategory();
+}
+
+function highlightCategory() {
+    let targetTeam = document.getElementById("category-team-select").value;
+
+    if (targetTeam == "Any") {
+        return;
+    }
+    targetTeam = parseInt(targetTeam);
+
+    let columns = document.getElementsByClassName("column");
+    console.log(columns[0]);
+
+    for (let i = 0; i < columns[0].children.length; i++) {
+        //console.log(columns[1][i]);
+        if (parseInt(columns[1].children[i].innerText) == targetTeam) {
+            columns[0].children[i].style.backgroundColor = "rgb(189, 95, 33)";
+            columns[1].children[i].style.backgroundColor = "rgb(189, 95, 33)";
+            columns[2].children[i].style.backgroundColor = "rgb(189, 95, 33)";
+            return;
+        }
+    }
 }
