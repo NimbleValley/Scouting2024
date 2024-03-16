@@ -10,14 +10,54 @@ const body = document.body;
 // TODO CHANGE THIS PLEASE PLEASE PLEASE PLEASE PLEASE ON FRIDAY NIGHT PLEASE PLEASE PLEASE
 const TEAM_MATCH_DATA = [
     {
-        "Match": 13,
-        "Red": [3197, 2202, 6421],
-        "Blue": [1714, 93, 4786]
+        "Match": 7,
+        "Red": [5148, 2506, 3630],
+        "Blue": [8029, 3891, 3197]
     },
     {
-        "Match": 27,
-        "Red": [1732, 1675, 1259],
-        "Blue": [6574, 3197, 5148]
+        "Match": 16,
+        "Red": [3197, 3734, 6574],
+        "Blue": [1306, 1091, 2062]
+    },
+    {
+        "Match": 22,
+        "Red": [5148, 2202, 9676],
+        "Blue": [2358, 3197, 706]
+    },
+    {
+        "Match": 29,
+        "Red": [537, 3381, 2220],
+        "Blue": [3197, 5148, 6421]
+    },
+    {
+        "Match": 45,
+        "Red": [1792, 3197, 8802],
+        "Blue": [9760, 930, 8744]
+    },
+    {
+        "Match": 51,
+        "Red": [93, 3197, 1714],
+        "Blue": [1259, 3692, 1792]
+    },
+    {
+        "Match": 57,
+        "Red": [5096, 8029, 2830],
+        "Blue": [3197, 8847, 9425]
+    },
+    {
+        "Match": 64,
+        "Red": [6381, 1781, 3197],
+        "Blue": [1732, 6823, 4786]
+    },
+    {
+        "Match": 81,
+        "Red": [4531, 4787, 7103],
+        "Blue": [2194, 6223, 3197]
+    },
+    {
+        "Match": 89,
+        "Red": [8802, 9535, 6223],
+        "Blue": [3197, 5586, 4645]
     }
 ]
 
@@ -788,7 +828,7 @@ function doMatch() {
 
     let blueColumns = [];
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 7; i++) {
         let tempColumn = document.createElement("div");
         tempColumn.className = "match-column"
         blueColumns.push(tempColumn);
@@ -804,9 +844,10 @@ function doMatch() {
     blueColumns[2].appendChild(createMatchCell(true, "TelePoints", true));
     blueColumns[3].appendChild(createMatchCell(true, "EndgamePoints", true));
     blueColumns[4].appendChild(createMatchCell(true, "TotalPoints", true));
-    blueColumns[5].appendChild(createMatchCell(true, "Gamepieces", true));
+    blueColumns[5].appendChild(createMatchCell(true, "Amps", true));
+    blueColumns[6].appendChild(createMatchCell(true, "Gamepieces", true));
 
-    let dataIndicies = [1, 2, 3, 4, -1];
+    let dataIndicies = [1, 2, 3, 4, 13, -1];
     let blueTotals = [];
 
     for (let i = 0; i < dataIndicies.length; i++) {
@@ -819,13 +860,16 @@ function doMatch() {
                 tempValue = TEAM_COLUMNS[5][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Blue[t]))] + TEAM_COLUMNS[8][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Blue[t]))] + TEAM_COLUMNS[10][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Blue[t]))] + TEAM_COLUMNS[13][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Blue[t]))];
             }
             tempValue = Math.round(tempValue * 10) / 10;
+            if (isNaN(tempValue)) {
+                tempValue = 0;
+            }
             blueTotals[i] += tempValue;
             blueColumns[i + 1].appendChild(createMatchCell(true, tempValue, false));
         }
     }
 
     for (let i = 0; i < blueTotals.length; i++) {
-        blueColumns[i + 1].appendChild(createMatchCell(true, blueTotals[i], true));
+        blueColumns[i + 1].appendChild(createMatchCell(true, Math.round(blueTotals[i] * 10) / 10, true));
     }
 
     matchField.appendChild(blueContainer);
@@ -838,7 +882,7 @@ function doMatch() {
 
     let redColumns = [];
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 7; i++) {
         let tempColumn = document.createElement("div");
         tempColumn.className = "match-column"
         redColumns.push(tempColumn);
@@ -854,7 +898,8 @@ function doMatch() {
     redColumns[2].appendChild(createMatchCell(false, "TelePoints", true));
     redColumns[3].appendChild(createMatchCell(false, "EndgamePoints", true));
     redColumns[4].appendChild(createMatchCell(false, "TotalPoints", true));
-    redColumns[5].appendChild(createMatchCell(false, "Gamepieces", true));
+    redColumns[5].appendChild(createMatchCell(false, "Amps", true));
+    redColumns[6].appendChild(createMatchCell(false, "Gamepieces", true));
 
     let redTotals = [];
 
@@ -868,13 +913,16 @@ function doMatch() {
                 tempValue = TEAM_COLUMNS[5][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Red[t]))] + TEAM_COLUMNS[8][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Red[t]))] + TEAM_COLUMNS[10][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Red[t]))] + TEAM_COLUMNS[13][TEAMS.indexOf(parseInt(TEAM_MATCH_DATA[matchNumber].Red[t]))];
             }
             tempValue = Math.round(tempValue * 10) / 10;
+            if (isNaN(tempValue)) {
+                tempValue = 0;
+            }
             redTotals[i] += tempValue;
             redColumns[i + 1].appendChild(createMatchCell(false, tempValue, false));
         }
     }
 
     for (let i = 0; i < redTotals.length; i++) {
-        redColumns[i + 1].appendChild(createMatchCell(false, redTotals[i], true));
+        redColumns[i + 1].appendChild(createMatchCell(false, Math.round(redTotals[i] * 10) / 10, true));
     }
 
     matchField.appendChild(redContainer);
@@ -2208,7 +2256,7 @@ async function setUpPickList() {
     let userInterval = parseInt(document.getElementById("auto-download-input").value) * 1000;
 
     if (!intervalID) {
-        intervalID = setInterval(dowlocalStoragePickListnloadPickList, userInterval > 10000 ? userInterval : 120000);
+        intervalID = setInterval(dowlocalStoragePickListnloadPickList, 10000);
         console.log("Set interval");
     }
 }
@@ -2219,6 +2267,22 @@ function localStoragePickList() {
 
 function downloadPickList() {
     let fileText = JSON.parse(JSON.stringify(PICK_LIST_TEAM_KEY));
+    for (let i = 0; i < fileText.length; i++) {
+        fileText[i] += "\n";
+    }
+    const element = document.createElement("a");
+    const file = new Blob(fileText, {
+        type: "text/plain",
+    });
+    element.href = URL.createObjectURL(file);
+    element.download = "PicklistRaw.txt";
+    document.body.appendChild(element);
+    element.click();
+}
+
+function recoverPickList() {
+    console.log(localStorage.getItem("pick-list-backup"));
+    let fileText = JSON.parse(JSON.stringify(localStorage.getItem("pick-list-backup").split(",")));
     for (let i = 0; i < fileText.length; i++) {
         fileText[i] += "\n";
     }
@@ -2731,4 +2795,8 @@ function highlightCategory() {
             return;
         }
     }
+}
+
+function dowlocalStoragePickListnloadPickList() {
+    localStorage.setItem("pick-list-backup", JSON.parse(JSON.stringify(PICK_LIST_TEAM_KEY)));
 }
