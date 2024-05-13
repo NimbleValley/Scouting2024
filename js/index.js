@@ -7,6 +7,9 @@ var tl = new TimelineMax();
 
 const body = document.body;
 
+var DARK_COLOR_SCHEME = true;
+setColorScheme();
+
 // TODO CHANGE THIS PLEASE PLEASE PLEASE PLEASE PLEASE ON FRIDAY NIGHT PLEASE PLEASE PLEASE
 const TEAM_MATCH_DATA = [
     {
@@ -66,6 +69,11 @@ let badCompareValues = [5, 8, 10, 13];
 // Sidebar variables, self explanatory
 const sidebar = document.getElementById("sidebar");
 const openSidebarButton = document.getElementById("open-sidebar");
+const sidebarButtonContainer = document.getElementById("side-button-container");
+if (window.innerHeight > window.innerWidth) {
+    openSidebarButton.innerText = "≡";
+    sidebarButtonContainer.removeChild(sidebarButtonContainer.children[sidebarButtonContainer.childElementCount-1]);
+}
 var sidebarOpen = true;
 
 
@@ -275,6 +283,10 @@ function removeActive() {
 
     for (let i = 0; i < sideButtons.length; i++) {
         sideButtons[i].classList = "side-button";
+    }
+
+    if (window.innerHeight > window.innerWidth) {
+        toggleSidebar();
     }
 }
 
@@ -643,11 +655,11 @@ function setUpCompare() {
     compareHeaderContainer.insertBefore(compareDescriptionContainer, compareHeaderContainer.childNodes[1]);
 
     let statContainers = [];
-    for (var i = 0; i < TEAM_FIELDS.length - 1; i++) {
+    for (let i = 0; i < TEAM_FIELDS.length - 1; i++) {
         let tempStat = document.createElement("div");
         tempStat.className = "stat-compare-container";
 
-        for (var t = 0; t < 2; t++) {
+        for (let t = 0; t < 2; t++) {
             let tempStatNumber = document.createElement("p");
             tempStatNumber.className = "compare-stat-number";
             tempStatNumber.innerText = "?";
@@ -684,7 +696,7 @@ function setUpCompare() {
 function doCompare(teamSelects, statContainers) {
     let teamIndices = [];
 
-    for (var i = 0; i < teamSelects.length; i++) {
+    for (let i = 0; i < teamSelects.length; i++) {
         localStorage.setItem(`compare-team-${i}`, teamSelects[i].value);
         console.log(localStorage.getItem(`compare-team-${i}`));
         teamIndices.push(TEAMS.indexOf(parseInt(teamSelects[i].value)));
@@ -692,12 +704,12 @@ function doCompare(teamSelects, statContainers) {
 
     console.log(teamIndices);
 
-    for (var i = 0; i < statContainers.length; i++) {
+    for (let i = 0; i < statContainers.length; i++) {
         let teamStats = [];
 
         let tempNumbers = statContainers[i].getElementsByClassName("compare-stat-number");
 
-        for (var t = 0; t < tempNumbers.length; t++) {
+        for (let t = 0; t < tempNumbers.length; t++) {
             tempNumbers[t].innerText = TEAM_COLUMNS[i + 1][teamIndices[t]];
 
             if (TEAM_COLUMNS[i + 1][teamIndices[t]] == 0) {
@@ -717,7 +729,7 @@ function doCompare(teamSelects, statContainers) {
             teamStats[1] = 0.1;
         }
 
-        for (var l = 0; l < 2; l++) {
+        for (let l = 0; l < 2; l++) {
             let tempLine = statContainers[i].getElementsByClassName("compare-inner-line")[l];
             let minStat = JSON.parse(JSON.stringify(teamStats)).sort(function (a, b) { return b - a })[1];
             let width = (teamStats[l] / minStat) * 50;
@@ -771,6 +783,11 @@ function doCompare(teamSelects, statContainers) {
             if (l == 1) {
                 tempLine.style.right = 0;
                 tempLine.style.backgroundColor = "#ffc400";
+                tempLine.style.borderTopRightRadius = "100000px";
+                tempLine.style.borderBottomRightRadius = "100000px";
+            } else {
+                tempLine.style.borderTopLeftRadius = "100000px";
+                tempLine.style.borderBottomLeftRadius = "100000px";
             }
         }
     }
@@ -1945,7 +1962,10 @@ function toggleSidebar() {
         //tl.to("#team-breakdown-select", { left: "0vh", duration: 0.5, ease: "power2" });
         tl.to(openSidebarButton, { scale: "1 1", duration: 0.5, ease: "power2" }, "-=0.5");
     } else {
-        tl.to(sidebar, { left: "-27vh", duration: 0.5, ease: "power2" });
+        if (window.innerWidth > window.innerHeight)
+            tl.to(sidebar, { left: "-27vh", duration: 0.5, ease: "power2" });
+        else
+            tl.to(sidebar, { left: "-100vw", duration: 0.5, ease: "power2" });
         //tl.to("#team-breakdown-select", { left: "34vh", duration: 0.5, ease: "power2" });
         tl.to(openSidebarButton, { scale: "-1 1", duration: 0.5, ease: "power2" }, "-=0.5");
     }
@@ -2799,4 +2819,15 @@ function highlightCategory() {
 
 function dowlocalStoragePickListnloadPickList() {
     localStorage.setItem("pick-list-backup", JSON.parse(JSON.stringify(PICK_LIST_TEAM_KEY)));
+}
+
+function setColorScheme() {
+    let root = document.querySelector(":root");
+    if (DARK_COLOR_SCHEME) {
+        root.style.setProperty("--bg-color", "rgb(10, 10, 10)");
+        root.style.setProperty("--data-table", "rgb(19, 19, 19)");
+    } else {
+        root.style.setProperty("--bg-color", "rgb(235, 235, 235)");
+        root.style.setProperty("--data-table", "rgb(210, 210, 210)");
+    }
 }

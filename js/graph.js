@@ -249,6 +249,10 @@ function showConsistencyLineGraph(canvas, matches, values, teams) {
         data: data
     };
 
+    if(window.innerHeight > window.innerWidth) {
+        graphContainer.style.width = `85vw`;
+    }
+
     graph = new Chart(canvas, config);
 }
 

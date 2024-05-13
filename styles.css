@@ -1,16 +1,20 @@
+:root {
+    --bg-color: rgb(10, 10, 10);
+    
+    --data-table: rgb(19, 19, 19);
+
+    --card-color: rgb(23, 23, 23);
+}
+
 html,
 body {
-    background-color: rgb(10, 10, 10);
+    background-color: var(--bg-color);
     font-family: 'Poppins', sans-serif;
     margin: 0;
     display: inline;
     width: max-content;
 }
 
-:root {
-    --bg-color: rgb(20, 20, 20);
-    --card-color: rgb(23, 23, 23);
-}
 
 ::selection {
     background: rgb(194, 110, 0);
@@ -25,7 +29,7 @@ body {
 /* RAW TABLE*/
 
 #data-table {
-    background-color: #131313;
+    background-color: var(--data-table);
     border-radius: 0.5vh;
     width: fit-content;
     display: flex;
@@ -35,6 +39,18 @@ body {
     position: relative;
     top: 0vh;
     z-index: 0;
+}
+
+/* WEB DATA TABLE MARGIN IS REMOVED */
+@media (max-aspect-ratio: 1/1) {
+    #data-table {
+        margin-left: 5vw;
+        left: 0;
+        justify-content: center;
+        width: 95vw;
+        margin-top: 15vw;
+        justify-content: flex-start;
+    }
 }
 
 .table-header-section-raw {
@@ -558,15 +574,15 @@ p {
 }
 
 #sidebar {
-    position: fixed;
     background-color: black;
     width: calc(27vh + 5vh);
     height: calc(100vh - 1.4vh);
     z-index: 100;
     display: flex;
     justify-content: flex-start;
-    left: 0vh;
+    left: 0vw;
     top: 0;
+    position: fixed;
 }
 
 #side-button-container {
@@ -667,6 +683,72 @@ p {
 
 .active:hover {
     border: 0.55vh solid rgb(104, 102, 102);
+}
+
+@media (max-aspect-ratio: 1/1) {
+    #sidebar {
+        width: 100vw;
+        justify-content: center;
+        top: 0;
+        height: 100vh;
+        left: -100vw;
+    }
+
+    .side-button {
+        font-size: 5vh;
+        text-align: center;
+        height: 8vh;
+        border: none;
+        width: 50vw;
+        line-height: 7vh;
+        background-color: transparent;
+    }
+
+    .side-button:hover {
+        color: orange;
+        font-size: 5vh;
+        text-align: center;
+        border: none;
+    }
+
+    .side-button:hover::after {
+        display: none;
+        background-color: transparent;
+    }
+    
+    .side-button:hover::before {
+        display: none;
+        background-color: transparent;
+    }
+
+    #side-button-container {
+        width: 50vw;
+        height: calc(97.5vh);
+    }
+
+    #open-sidebar {
+        width: 13vw;
+        height: 13vw;
+        position: fixed;
+        left: 1vw;
+        top: 3vw;
+        border: solid 1vw orange;
+        border-radius: 1vw;
+        text-align: center;
+        font-size: 10vw;
+        display: flex;
+        justify-content: center;
+    }
+
+    #open-sidebar:hover {
+        background-color: #000000;
+        color: white;
+    }
+
+    .active {
+        text-decoration: underline;
+        color: rgb(189, 95, 33);
+    }
 }
 
 
@@ -840,6 +922,8 @@ h2 {
     align-items: center;
     border-radius: 1vh;
     transition: background-color 0.15s;
+    margin-top: 2vw;
+    padding-top: 2vh;
 }
 
 .compare-team-select {
@@ -848,11 +932,14 @@ h2 {
 
 .compare-stat-number {
     color: white;
-    width: 10vh !important;
+    width: 10vh;
     font-size: 3vh;
     text-align: center;
     transition: background-color 0.25s, font-weight 0.25s, text-shadow 0.25s, border 0.25s;
     border-radius: 1vh;
+    line-height: 7vh;
+    height: calc(100% + 3vh - 1vh);
+    margin-top: calc(-3vh);
 }
 
 .compare-stat-description {
@@ -867,6 +954,7 @@ h2 {
     padding: 0.5vh;
     margin-top: -0.5vh;
     transition: opacity 0.15s;
+    top: -3vh;
 }
 
 .compare-line-container {
@@ -889,7 +977,7 @@ h2 {
 }
 
 .stat-compare-container:hover .compare-stat-description {
-    opacity: 0;
+    opacity: 1;
 }
 
 .compare-inner-line {
@@ -898,7 +986,7 @@ h2 {
     background-color: red;
     position: absolute;
     top: 0;
-    border-radius: 1000000px;
+    border-radius: 0;
     transition: width 0.25s;
 }
 
@@ -922,6 +1010,42 @@ h2 {
     background: linear-gradient(90deg, rgb(255, 199, 157) 0%, rgb(223, 183, 3) 7.5vh);
     background-size: 400% 400%;
     animation: compare-pulse 3s infinite ease-in;
+}
+
+@media (max-aspect-ratio: 1/1) {
+    #compare-container {
+        width: 85vw;
+    }
+
+    .compare-line-container {
+        width: 50vw;
+    }
+
+    .compare-stat-number {
+        width: 10vw;
+    }
+
+    #compare-header-container {
+        width: 80vw;
+        margin-top: 2vw;
+    }
+
+    #compare-header-container p {
+        display: none;
+    }
+
+    .stat-compare-container {
+        padding-top: 3vh;
+        margin-bottom: 1vh;
+    }
+
+    .compare-stat-description {
+        top: -3vh;
+    }
+
+    .stat-compare-container:hover .compare-stat-description {
+        opacity: 1;
+    }
 }
 
 #match-select {
@@ -1453,6 +1577,19 @@ h6 {
     color: white !important;
 }
 
+@media (max-aspect-ratio: 1/1) { 
+    #graph-container {
+        margin-top: 5vw;
+    }
+
+    #graph-canvas {
+        margin-left: -5vw;
+    }
+    #graph-category-select-team {
+        margin-right: 2vw !important;
+    }
+}
+
 
 
 
@@ -1508,6 +1645,20 @@ h6 {
     margin-left: 5vh;
 }
 
+@media (max-aspect-ratio: 1/1) {
+    #category-container {
+        width: 80vw;
+    }
+
+    #category-team-select {
+        float: right;
+    }
+    
+    #category-category-select {
+        float: right;
+        margin-top: 2.5vh;
+    }
+}
 
 
 
