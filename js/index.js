@@ -1014,16 +1014,16 @@ function setUpGraph() {
     let temp = document.createElement("select");
     temp.id = "graph-number-select";
     temp.style.width = "25vh";
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
         let op = document.createElement("option");
         if (i == 0) {
             op.text = i + 1 + " Value";
         } else if (i == 1) {
             op.text = i + 1 + " Values";
         } else if (i == 2) {
-            op.text = "Consistency Matrix"
-        } else if (i == 3) {
             op.text = "Consistency Line"
+        } else if (i == 3) {
+            op.text = "Consistency Matrix"
         }
         op.value = i + 1;
         temp.append(op);
@@ -1121,7 +1121,7 @@ function doGraph() {
             }
             showScatterChart(graphCanvas, teamData2d, [TEAM_FIELDS[graphColumn], TEAM_FIELDS[secondGraphColumn]]);
             break;
-        case 3:
+        case 4:
             document.getElementById("graph-category-select").style.display = "none";
             document.getElementById("graph-category-select-team").style.display = "block";
             let tempData = [];
@@ -1226,7 +1226,7 @@ function doGraph() {
             // TODO Add in the color-coding, probably just sort each row & pass an array of indexes into function
             showMatrixGraph(graphCanvas, formattedData, matchesSorted, includedFields, "Description");
             break;
-        case 4:
+        case 3:
             let teamSelect = document.getElementById("graph-category-select-team");
             let valueSelect = document.getElementById("graph-category-select");
 

@@ -697,7 +697,7 @@ p {
     .side-button {
         font-size: 5vh;
         text-align: center;
-        height: 8vh;
+        height: 6vh;
         border: none;
         width: 50vw;
         line-height: 7vh;
@@ -723,7 +723,7 @@ p {
 
     #side-button-container {
         width: 50vw;
-        height: calc(97.5vh);
+        height: calc(90vh);
     }
 
     #open-sidebar {
@@ -735,7 +735,7 @@ p {
         border: solid 1vw orange;
         border-radius: 1vw;
         text-align: center;
-        font-size: 10vw;
+        font-size: 11vw;
         display: flex;
         justify-content: center;
     }
@@ -1352,6 +1352,13 @@ a:hover {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+}
+
+@media (max-aspect-ratio: 1/1) {
+    #breakdown-grid {
+        margin-left: 25vw;
+        grid-template-columns: 35vh 1fr;
+    }
 }
 
 #breakdown-auto-values-container {
