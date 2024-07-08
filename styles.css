@@ -238,6 +238,8 @@ h3 {
     height: fit-content;
     align-items: start;
     width: calc(100% - 35vh);
+    display: grid;
+    grid-template-columns: 0vh 5vh auto;
 }
 
 #inner-pick-list-container {
@@ -255,6 +257,30 @@ h3 {
     flex-direction: column;
     font-size: 2.5vh !important;
     max-width: calc(100vw - 35vh - 32.5vh);
+}
+
+#number-pick-list-container {
+    position: relative;
+    margin-top: 0vh;
+    width: fit-content;
+    row-gap: 1vh;
+    height: fit-content;
+    background-color: #131313;
+    padding: 1vh;
+    padding-top: 1vh;
+    border-radius: 0.75vh;
+    display: flex;
+    flex-direction: column;
+    font-size: 2.5vh !important;
+}
+
+.pick-list-number {
+    color: rgb(255, 220, 146);
+    width: fit-content;
+    height: 4vh;
+    padding: 0.5vh 0vh 0.5vh 0vh;
+    user-select: none;
+    font-weight: bold;
 }
 
 .pick-list-team {

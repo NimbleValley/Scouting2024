@@ -4,9 +4,10 @@
 // Animation timeline
 var tl = new TimelineMax();
 
-
+// The body
 const body = document.body;
 
+// For later, not done yet
 var DARK_COLOR_SCHEME = true;
 setColorScheme();
 
@@ -72,7 +73,7 @@ const openSidebarButton = document.getElementById("open-sidebar");
 const sidebarButtonContainer = document.getElementById("side-button-container");
 if (window.innerHeight > window.innerWidth) {
     openSidebarButton.innerText = "≡";
-    sidebarButtonContainer.removeChild(sidebarButtonContainer.children[sidebarButtonContainer.childElementCount-1]);
+    sidebarButtonContainer.removeChild(sidebarButtonContainer.children[sidebarButtonContainer.childElementCount - 1]);
 }
 var sidebarOpen = true;
 
@@ -181,6 +182,8 @@ var PICK_LIST_ORDER = new Array();
 
 // Container for entier pick list page, buttons and the list
 const pickListContainer = document.getElementById("pick-list-container");
+// Container for pick list numbers
+const numberPickListContainer = document.getElementById("number-pick-list-container");
 // Container for sortable pick list divs
 const innerPickListContainer = document.getElementById("inner-pick-list-container");
 // Team colors, green for good, red for bad, etc.
@@ -242,6 +245,8 @@ new Sortable(innerPickListContainer, {
 localStorage.setItem("previousHighlightRow", -1);
 
 const pickListScaleSlider = document.getElementById("pick-list-scale");
+// TODO I hid it for now
+pickListScaleSlider.style.display = "none";
 pickListScaleSlider.addEventListener("input", pickListSliderCallback);
 
 // TBA API constants, for finding events
@@ -1983,15 +1988,21 @@ async function setUpPickList() {
     graphContainer.style.display = "none";
     breakdownGrid.style.display = "none";
     rawTable.innerHTML = "";
-    pickListContainer.style.display = "block";
+    pickListContainer.style.display = "grid";
 
     innerPickListContainer.innerHTML = "";
-    for (var i = 0; i < TEAMS.length; i++) {
-        var tempTeam = document.createElement("div");
+    for (let i = 0; i < TEAMS.length; i++) {
+        let tempNumber = document.createElement("div");
+        tempNumber.innerText = (i + 1) % 5 == 0 ? i + 1 : "";
+        tempNumber.style.color = (i + 1) % 5 == 0 ? "rgb(255, 220, 146)" : "transparent";
+        tempNumber.className = "pick-list-number";
+        numberPickListContainer.appendChild(tempNumber);
+
+        let tempTeam = document.createElement("div");
         tempTeam.className = "pick-list-team";
         tempTeam.id = i;
 
-        var tempTeamText = document.createElement("h7");
+        let tempTeamText = document.createElement("h7");
         tempTeamText.innerText = PICK_LIST_OBJECTS[i].getTeam();
 
         tempTeam.appendChild(tempTeamText);
@@ -2680,7 +2691,7 @@ function setUpCategories() {
 
     let anyOption = document.createElement("option");
     anyOption.value = "Any";
-    anyOption.innerText = "Any";
+    anyOption.innerText = "Team?";
     tempTeamSelect.appendChild(anyOption);
 
     let tempSelectContainer = document.createElement("div");
@@ -2812,6 +2823,7 @@ function highlightCategory() {
             columns[0].children[i].style.backgroundColor = "rgb(189, 95, 33)";
             columns[1].children[i].style.backgroundColor = "rgb(189, 95, 33)";
             columns[2].children[i].style.backgroundColor = "rgb(189, 95, 33)";
+            columns[0].children[i].scrollIntoView();
             return;
         }
     }
