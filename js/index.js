@@ -65,7 +65,7 @@ const TEAM_MATCH_DATA = [
     }
 ]
 
-let badCompareValues = [5, 8, 10, 13];
+let badCompareValues = [5, 8, 10];
 
 // Sidebar variables, self explanatory
 const sidebar = document.getElementById("sidebar");
@@ -97,8 +97,8 @@ const breakdownLines = document.getElementById("breakdown-lines-container");
 const breakdownGrid = document.getElementById("breakdown-grid");
 
 // FIXME important these match up, probably could improve
-const breakdownCategoryHeaders = ["Total Points", "Auto Points", "Tele Points", "Endgame points", "Tele Amp", "Tele Speaker"];
-const sortIndexes = [4, 1, 2, 3, 14, 10];
+const breakdownCategoryHeaders = ["Total Points", "Auto Points", "Tele Points", "Endgame points", "Tele Amp", "Tele Speaker", "Gamepieces", "Passes"];
+const sortIndexes = [4, 1, 2, 3, 14, 10, 15, 14];
 
 var firstbreakdown = true;
 
